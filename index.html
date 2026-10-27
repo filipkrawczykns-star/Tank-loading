@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kalkulator komór cysterny</title>
+<meta name="theme-color" content="#e2700a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Komory">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-family:system-ui,sans-serif;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: narzędzie dwukolumnowe (dane | wynik), na telefonie jedna kolumna; akcent = pomarańcz tablicy ADR */
+:root{
+  --bg:#eef0ef; --surface:#ffffff; --ink:#1b1f22; --muted:#5b646b; --line:#d3d8d7;
+  --accent:#e2700a; --accent-ink:#1b1f22; --liquid:#3d7193; --liquid-soft:#d6e4ee;
+  --ok:#2c7a4b; --warn:#a96a12; --bad:#b3261e; --tank:#c9cfd1;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"Barlow","Segoe UI",Roboto,Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#131619; --surface:#1b2024; --ink:#e6e9eb; --muted:#97a1a8; --line:#2d3439;
+  --accent:#f08a2c; --accent-ink:#1b1f22; --liquid:#5f9ec4; --liquid-soft:#1f3442;
+  --ok:#5cbf83; --warn:#e0a544; --bad:#ef6b62; --tank:#394146; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#131619; --surface:#1b2024; --ink:#e6e9eb; --muted:#97a1a8; --line:#2d3439;
+  --accent:#f08a2c; --accent-ink:#1b1f22; --liquid:#5f9ec4; --liquid-soft:#1f3442;
+  --ok:#5cbf83; --warn:#e0a544; --bad:#ef6b62; --tank:#394146; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45}
+.wrap{max-width:1180px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+h1{font-family:var(--f-display);font-weight:700;font-size:2rem;line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
+.sub{color:var(--muted);margin:6px 0 0;max-width:60ch}
+.grid{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+section{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.col{display:flex;flex-direction:column;gap:18px;min-width:0}
+h2{font-family:var(--f-display);font-weight:600;font-size:1.25rem;margin:0;letter-spacing:.02em;text-transform:uppercase;display:flex;align-items:baseline;gap:8px}
+h2 small{font-family:var(--f-body);text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted);font-size:.85rem}
+label{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;display:block;margin-bottom:4px}
+input,select,button{font:inherit;color:inherit}
+input[type=number],input[type=text],select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:4px;background:var(--bg);font-family:var(--f-mono);font-size:.95rem}
+select{font-family:var(--f-body)}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media (max-width:420px){.row3{grid-template-columns:1fr 1fr}}
+.hint{font-size:.82rem;color:var(--muted);margin:0}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:.88rem}
+.check input{margin-top:3px}
+button{cursor:pointer;border-radius:4px;border:1px solid var(--line);background:var(--bg);padding:8px 12px;font-weight:600}
+button:hover{border-color:var(--muted)}
+.btn-accent{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn-accent:hover{filter:brightness(1.05);border-color:var(--accent)}
+.prod-top{display:flex;gap:12px;align-items:flex-start}
+.prod-top > div{flex:1;min-width:0}
+/* Tablica ADR */
+.plate{flex:none;width:74px;border:3px solid #111;border-radius:3px;background:#f28c00;color:#111;font-family:var(--f-mono);font-weight:500;text-align:center}
+.plate div{padding:3px 0;font-size:1rem;line-height:1.2;min-height:1.6em}
+.plate div+div{border-top:3px solid #111}
+.plate.none{opacity:.35}
+.ask{display:flex;gap:8px}
+.ask input{flex:1}
+.note{font-size:.82rem;padding:8px 10px;border-radius:4px;background:var(--bg);border:1px dashed var(--line);margin:0}
+/* Komory */
+.comps{display:flex;flex-direction:column;gap:8px}
+.comp{display:grid;grid-template-columns:30px minmax(0,1fr) auto 34px;gap:8px;align-items:center}
+.comp .n{font-family:var(--f-display);font-size:1.3rem;font-weight:700;text-align:center;color:var(--muted)}
+.seg{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:8px 10px;background:var(--bg);font-weight:500;font-size:.85rem}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--surface)}
+.del{padding:8px 0;color:var(--muted)}
+.comp-head{display:grid;grid-template-columns:30px minmax(0,1fr) auto 34px;gap:8px;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.slider{display:flex;flex-direction:column;gap:4px}
+.slider input{width:100%;accent-color:var(--accent)}
+.slider .ends{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted)}
+/* Wynik */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{border-left:3px solid var(--line);padding:2px 0 2px 10px}
+.stat b{display:block;font-family:var(--f-mono);font-weight:500;font-size:1.15rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.tankbox{overflow-x:auto}
+.tank{display:flex;gap:4px;padding:10px;background:var(--tank);border-radius:40px 14px 14px 40px;min-width:420px;position:relative}
+.cell{position:relative;height:120px;background:var(--surface);border-radius:4px;overflow:hidden;min-width:0}
+.cell .fill{position:absolute;left:0;right:0;bottom:0;background:var(--liquid);transition:height .35s ease}
+.cell .lim{position:absolute;left:0;right:0;border-top:1px dashed var(--muted);opacity:.7}
+.cell .baf{position:absolute;top:8px;bottom:8px;left:50%;border-left:2px dotted var(--muted);opacity:.6}
+.cell .lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:.82rem;text-align:center;line-height:1.2;color:var(--ink);text-shadow:0 0 3px var(--surface)}
+.cell .lbl strong{font-family:var(--f-display);font-size:1.25rem}
+.cog{position:absolute;bottom:-2px;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:10px solid var(--accent);transform:translateX(-8px)}
+.cog.t{border-bottom-color:transparent;border-top:10px solid var(--muted);bottom:auto;top:-2px}
+.dir{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:6px;min-width:420px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;margin-right:5px;vertical-align:-1px}
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;min-width:520px}
+th,td{padding:8px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+td{font-family:var(--f-mono);font-size:.9rem}
+th:first-child,td:first-child{text-align:left}
+td.st{font-family:var(--f-body);text-align:left}
+tfoot td{font-weight:500;border-bottom:0}
+.pill{display:inline-block;font-family:var(--f-body);font-size:.75rem;font-weight:600;padding:2px 8px;border-radius:10px;border:1px solid currentColor}
+.p-ok{color:var(--ok)}.p-warn{color:var(--warn)}.p-mut{color:var(--muted)}.p-bad{color:var(--bad)}
+.variants{display:flex;gap:8px;flex-wrap:wrap}
+.variants button[aria-pressed=true]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.msgs{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.msgs li{font-size:.88rem;padding:8px 10px;border-radius:4px;border-left:3px solid var(--warn);background:var(--bg)}
+.msgs li.bad{border-left-color:var(--bad)}
+.msgs li.info{border-left-color:var(--liquid)}
+.foot{font-size:.8rem;color:var(--muted);max-width:75ch}
+.mono{font-family:var(--f-mono)}
+.seg.wide button{flex:1}
+input.kg{width:96px;padding:6px 8px;text-align:right;border-color:var(--accent)}
+.cell .fill.over{background:var(--bad)}
+@media (prefers-reduced-motion:reduce){.cell .fill{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <div>
+    <h1>Kalkulator komór cysterny</h1>
+    <p class="sub">Podział ładunku na komory zgodnie z ADR 4.3.2.2 (stopień napełnienia) i 4.3.2.3.6 (zasada 20/80 dla komór bez falochronów).</p>
+  </div>
+</header>
+
+<div class="grid">
+<div class="col">
+  <section aria-labelledby="h-prod">
+    <h2 id="h-prod">1. Produkt</h2>
+    <div class="prod-top">
+      <div>
+        <label for="prod">Produkt</label>
+        <select id="prod"></select>
+      </div>
+      <div class="plate" id="plate" aria-label="Tablica ADR"><div id="pl-k"></div><div id="pl-un"></div></div>
+    </div>
+    <div class="ask" id="askBox" hidden>
+      <input type="text" id="askName" placeholder="Nazwa lub numer UN, np. octan etylu">
+      <button type="button" id="askBtn">Zapytaj Claude</button>
+    </div>
+    <p class="note" id="askNote" hidden></p>
+    <div class="row">
+      <div><label for="d15">Gęstość w 15 °C (kg/l)</label><input type="number" id="d15" step="0.001" min="0.3" max="3"></div>
+      <div><label for="alpha">Wsp. rozszerzalności α (1/°C)</label><input type="number" id="alpha" step="0.00001" min="0" max="0.003"></div>
+    </div>
+    <div class="row">
+      <div><label for="temp">Temp. produktu (°C)</label><input type="number" id="temp" step="1" min="-30" max="80"></div>
+      <div><label for="lim">Limit terminalu/firmy (%)</label><input type="number" id="lim" step="0.5" min="50" max="100" placeholder="brak"></div>
+    </div>
+    <div>
+      <label for="kform">Wzór na maks. napełnienie (ADR 4.3.2.2.1)</label>
+      <select id="kform">
+        <option value="100">100/(1+α(50−t)) · zapalne, bez zagrożeń dodatkowych</option>
+        <option value="98">98/(1+α(50−t)) · toksyczne lub żrące</option>
+        <option value="97">97/(1+α(50−t)) · zapalne lekko toks./żrące, zbiornik hermetyczny</option>
+        <option value="95">95/(1+α(50−t)) · toksyczne/żrące, zbiornik hermetyczny</option>
+      </select>
+    </div>
+    <label class="check" for="visc" style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--ink)"><input type="checkbox" id="visc"> Produkt lepki (≥ 2680 mm²/s w 20 °C), zasada 20/80 nie obowiązuje</label>
+    <p class="hint">Wartości z listy są typowe i przybliżone. Do obliczeń wpisz gęstość z dokumentu załadunkowego terminalu.</p>
+  </section>
+
+  <section aria-labelledby="h-comp">
+    <h2 id="h-comp">2. Komory <small>od przodu do tyłu</small></h2>
+    <div class="comp-head"><span>Nr</span><span>Pojemność (l)</span><span>Falochrony</span><span></span></div>
+    <div class="comps" id="comps"></div>
+    <button type="button" id="addComp">+ Dodaj komorę</button>
+    <p class="hint">Komora bez falochronów o pojemności powyżej 7500 l może być napełniona tylko do 20% lub od 80%.</p>
+  </section>
+
+  <section aria-labelledby="h-load">
+    <h2 id="h-load">3. Załadunek</h2>
+    <div class="row">
+      <div><label for="mass">Masa do załadunku (kg)</label><input type="number" id="mass" step="10" min="0"></div>
+      <div><label for="payload">Dopuszczalna ładowność (kg)</label><input type="number" id="payload" step="10" min="0" placeholder="opcjonalnie"></div>
+    </div>
+    <div>
+      <label id="strat-l">Sposób rozłożenia</label>
+      <div class="seg wide" id="strat" role="group" aria-labelledby="strat-l">
+        <button type="button" data-v="even">Równomiernie</button><button type="button" data-v="min">Najmniej częściowych komór</button>
+      </div>
+      <p class="hint" style="margin-top:6px">Równomiernie: podobny stopień napełnienia we wszystkich komorach, w ramach przepisów. Drugi tryb ogranicza liczbę częściowo napełnionych komór.</p>
+    </div>
+    <div class="slider">
+      <label for="target">Docelowy środek ciężkości ładunku: <span id="targetVal" class="mono"></span></label>
+      <input type="range" id="target" min="0" max="100" step="1">
+      <div class="ends"><span>Przód (siodło)</span><span>Środek</span><span>Tył (osie naczepy)</span></div>
+    </div>
+  </section>
+</div>
+
+<div class="col">
+  <section aria-labelledby="h-res" aria-live="polite">
+    <h2 id="h-res">Plan załadunku</h2>
+    <div class="stats" id="stats"></div>
+    <div class="variants" id="variants"></div>
+    <div class="tankbox">
+      <div class="tank" id="tank"></div>
+      <div class="dir"><span>◀ Przód</span><span>Tył ▶</span></div>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--liquid)"></i>Produkt</span>
+      <span><i style="border-top:2px dashed var(--muted);height:0;width:14px"></i>Maks. napełnienie</span>
+      <span><i style="border-left:2px dotted var(--muted);width:2px"></i>Falochrony</span>
+      <span><i style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:9px solid var(--accent);background:none"></i>Środek ciężkości</span>
+      <span><i style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:9px solid var(--muted);background:none"></i>Cel</span>
+    </div>
+    <div class="tablebox"><table id="tbl"></table></div>
+    <ul class="msgs" id="msgs"></ul>
+  </section>
+  <p class="foot">Kalkulator nie zna nacisków na osie Twojego zestawu. Środek ciężkości liczony jest wzdłuż zbiornika przy założeniu stałego przekroju komór. Przed odjazdem sprawdź naciski na wadze lub systemie ważenia pokładowego i stosuj się do instrukcji terminalu.</p>
+</div>
+</div>
+</div>
+
+<script>
+const PRODUCTS=[
+ {g:"ADR · klasa 3",id:"diesel",n:"Olej napędowy (ON)",d:0.835,a:0.00084,k:100,un:"1202",ke:"30"},
+ {g:"ADR · klasa 3",id:"petrol",n:"Benzyna (E5/E10)",d:0.745,a:0.00120,k:100,un:"1203",ke:"33"},
+ {g:"ADR · klasa 3",id:"ethanol",n:"Etanol",d:0.794,a:0.00110,k:100,un:"1170",ke:"33"},
+ {g:"ADR · klasa 3",id:"methanol",n:"Metanol",d:0.796,a:0.00120,k:98,un:"1230",ke:"336"},
+ {g:"ADR · klasa 3",id:"acetone",n:"Aceton",d:0.797,a:0.00143,k:100,un:"1090",ke:"33"},
+ {g:"ADR · klasa 3",id:"toluene",n:"Toluen",d:0.871,a:0.00108,k:100,un:"1294",ke:"33"},
+ {g:"ADR · klasa 3",id:"xylene",n:"Ksylen",d:0.868,a:0.00099,k:100,un:"1307",ke:"30"},
+ {g:"ADR · klasa 3",id:"ipa",n:"Izopropanol",d:0.789,a:0.00107,k:100,un:"1219",ke:"33"},
+ {g:"ADR · klasa 8",id:"h2so4",n:"Kwas siarkowy 96%",d:1.840,a:0.00057,k:98,un:"1830",ke:"80"},
+ {g:"ADR · klasa 8",id:"naoh",n:"Ług sodowy (NaOH 50%)",d:1.530,a:0.00045,k:98,un:"1824",ke:"80"},
+ {g:"ADR · klasa 8",id:"hcl",n:"Kwas solny 32%",d:1.160,a:0.00045,k:98,un:"1789",ke:"80"},
+ {g:"ADR · klasa 8",id:"h3po4",n:"Kwas fosforowy 75%",d:1.580,a:0.00040,k:98,un:"1805",ke:"80"},
+ {g:"Bez ADR · glikole i chemia",id:"meg",n:"Glikol monoetylenowy (MEG)",d:1.116,a:0.00062,k:100,un:"",ke:"",nadr:1},
+ {g:"Bez ADR · glikole i chemia",id:"deg",n:"Glikol dietylenowy (DEG)",d:1.120,a:0.00064,k:100,un:"",ke:"",nadr:1},
+ {g:"Bez ADR · glikole i chemia",id:"mpg",n:"Glikol propylenowy (MPG)",d:1.038,a:0.00072,k:100,un:"",ke:"",nadr:1},
+ {g:"Bez ADR · glikole i chemia",id:"glycerol",n:"Gliceryna (glicerol 99%)",d:1.264,a:0.00050,k:100,un:"",ke:"",nadr:1},
+ {g:"Bez ADR · glikole i chemia",id:"adblue",n:"AdBlue (mocznik 32,5%)",d:1.091,a:0.00045,k:100,un:"",ke:"",nadr:1},
+ {g:"Bez ADR · glikole i chemia",id:"rsm",n:"Nawóz RSM 32",d:1.320,a:0.00050,k:100,un:"",ke:"",nadr:1},
+ {g:"Bez ADR · oleje",id:"fame",n:"Biodiesel (FAME)",d:0.883,a:0.00083,k:100,un:"",ke:"",nadr:1},
+ {g:"Bez ADR · oleje",id:"base",n:"Olej bazowy mineralny (SN150)",d:0.865,a:0.00070,k:100,un:"",ke:"",nadr:1},
+ {g:"Bez ADR · oleje",id:"hydr",n:"Olej hydrauliczny / smarowy",d:0.875,a:0.00068,k:100,un:"",ke:"",nadr:1},
+ {g:"Bez ADR · tłuszcze roślinne i zwierzęce",id:"rape",n:"Olej rzepakowy",d:0.917,a:0.00072,k:100,un:"",ke:"",nadr:1},
+ {g:"Bez ADR · tłuszcze roślinne i zwierzęce",id:"sun",n:"Olej słonecznikowy",d:0.921,a:0.00072,k:100,un:"",ke:"",nadr:1},
+ {g:"Bez ADR · tłuszcze roślinne i zwierzęce",id:"soy",n:"Olej sojowy",d:0.922,a:0.00072,k:100,un:"",ke:"",nadr:1},
+ {g:"Bez ADR · tłuszcze roślinne i zwierzęce",id:"palm",n:"Olej palmowy (podgrzewany)",d:0.914,a:0.00073,k:100,un:"",ke:"",nadr:1,t:55,lim:98},
+ {g:"Bez ADR · tłuszcze roślinne i zwierzęce",id:"tallow",n:"Tłuszcz zwierzęcy / łój (podgrzewany)",d:0.915,a:0.00075,k:100,un:"",ke:"",nadr:1,t:60,lim:98},
+ {g:"Bez ADR · tłuszcze roślinne i zwierzęce",id:"uco",n:"Olej posmażalniczy (UCO)",d:0.920,a:0.00072,k:100,un:"",ke:"",nadr:1},
+ {g:"Bez ADR · tłuszcze roślinne i zwierzęce",id:"molasses",n:"Melasa",d:1.400,a:0.00040,k:100,un:"",ke:"",nadr:1,visc:1},
+ {g:"Inne",id:"custom",n:"Inny / własne dane",d:1.000,a:0.00060,k:100,un:"",ke:""}
+];
+const $=id=>document.getElementById(id);
+const fmt=(v,d=0)=>Number(v).toLocaleString("pl-PL",{minimumFractionDigits:d,maximumFractionDigits:d});
+const EXAMPLE={prod:"diesel",d15:0.835,alpha:0.00084,temp:12,lim:"",kform:"100",visc:false,mass:24500,payload:"",target:50,
+ comps:[{c:9500,b:true},{c:7000,b:false},{c:6500,b:false},{c:9500,b:false}],un:"1202",ke:"30"};
+let S;
+try{S=JSON.parse(localStorage.getItem("cysterna-v1"))}catch(e){S=null}
+if(!S||!Array.isArray(S.comps))S=JSON.parse(JSON.stringify(EXAMPLE));
+if(S.strategy!=="min")S.strategy="even";if(!Array.isArray(S.manual))S.manual=[];
+let chosen=0, lastSolutions=[], solveCache={k:null,v:[]};
+
+function save(){try{localStorage.setItem("cysterna-v1",JSON.stringify(S))}catch(e){}}
+
+// ---- UI: produkt
+const sel=$("prod");
+{const groups={};PRODUCTS.forEach(p=>{let g=groups[p.g];if(!g){g=groups[p.g]=document.createElement("optgroup");g.label=p.g;sel.appendChild(g)}
+ const o=document.createElement("option");o.value=p.id;o.textContent=p.n+(p.un?" · UN "+p.un:"");g.appendChild(o)})}
+function loadForm(){
+ sel.value=S.prod;$("d15").value=S.d15;$("alpha").value=S.alpha;$("temp").value=S.temp;$("lim").value=S.lim;
+ $("kform").value=S.kform;$("visc").checked=S.visc;$("mass").value=S.mass;$("payload").value=S.payload;$("target").value=S.target;
+ renderPlate();renderComps();
+}
+function renderPlate(){
+ $("pl-k").textContent=S.ke||"";$("pl-un").textContent=S.un||(S.nadr?"bez ADR":"");
+ $("plate").classList.toggle("none",!S.un);
+}
+sel.addEventListener("change",()=>{
+ const p=PRODUCTS.find(x=>x.id===sel.value);S.prod=p.id;
+ if(p.id!=="custom"){S.d15=p.d;S.alpha=p.a;S.kform=String(p.k);S.un=p.un;S.ke=p.ke;S.nadr=!!p.nadr;S.visc=!!p.visc;S.lim=p.lim||"";if(p.t!==undefined)S.temp=p.t}else{S.un="";S.ke="";S.nadr=false}
+ $("askNote").hidden=true;loadForm();update();
+});
+["d15","alpha","temp","lim","mass","payload","target"].forEach(id=>$(id).addEventListener("input",()=>{S[id]=$(id).value;update()}));
+$("kform").addEventListener("change",()=>{S.kform=$("kform").value;update()});
+$("visc").addEventListener("change",()=>{S.visc=$("visc").checked;update()});
+
+// ---- UI: komory
+function renderComps(){
+ const box=$("comps");box.innerHTML="";
+ S.comps.forEach((k,i)=>{
+  const r=document.createElement("div");r.className="comp";
+  r.innerHTML=`<span class="n">${i+1}</span>
+   <input type="number" id="cap${i}" min="100" step="50" value="${k.c}" aria-label="Pojemność komory ${i+1} w litrach">
+   <div class="seg" role="group" aria-label="Falochrony w komorze ${i+1}">
+    <button type="button" data-v="1" aria-pressed="${k.b}">Tak</button><button type="button" data-v="0" aria-pressed="${!k.b}">Nie</button></div>
+   <button type="button" class="del" aria-label="Usuń komorę ${i+1}" ${S.comps.length<2?"disabled":""}>✕</button>`;
+  r.querySelector("input").addEventListener("input",e=>{k.c=+e.target.value;update()});
+  r.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{k.b=b.dataset.v==="1";renderComps();update()}));
+  r.querySelector(".del").addEventListener("click",()=>{S.comps.splice(i,1);renderComps();update()});
+  box.appendChild(r);
+ });
+}
+document.querySelectorAll("#strat button").forEach(b=>b.addEventListener("click",()=>{S.strategy=b.dataset.v;if(chosen!=="manual")chosen=0;update()}));
+$("addComp").addEventListener("click",()=>{if(S.comps.length>=10)return;S.comps.push({c:7000,b:true});renderComps();update()});
+
+// ---- obliczenia
+function params(){
+ const d15=+S.d15, a=+S.alpha, t=+S.temp, K=+S.kform;
+ const dt=d15/(1+a*(t-15));                    // gęstość w temp. załadunku
+ let fmax=K/(1+a*(50-t))/100;                   // ADR 4.3.2.2.1
+ fmax=Math.min(fmax,1);
+ const lim=parseFloat(S.lim); if(lim>0) fmax=Math.min(fmax,lim/100);
+ return {d15,a,t,dt,fmax};
+}
+function compModel(fmax){
+ const tot=S.comps.reduce((s,k)=>s+(+k.c||0),0);let acc=0;
+ return S.comps.map(k=>{const C=+k.c||0;const pos=tot?(acc+C/2)/tot:0;acc+=C;
+  const restr=!k.b&&C>7500&&!S.visc;const F=Math.floor(C*fmax);
+  const segs=restr?[[1,Math.min(Math.floor(C*0.2),F)],[Math.ceil(C*0.8),F]].filter(s=>s[1]>=s[0]):[[1,F]];
+  return {C,F,pos,restr,b:k.b,segs};});
+}
+const inSegs=(x,segs)=>segs.some(s=>x>=s[0]-0.5&&x<=s[1]+0.5);
+const okAmt=(x,m)=>x<=0.5||inSegs(x,m.segs)||Math.abs(x-m.F)<=0.5;
+function evalAlloc(x,M,target,mode){
+ let pen=0,sum=0,mom=0;const fills=[];
+ x.forEach((v,i)=>{const m=M[i];sum+=v;mom+=v*m.pos;fills.push(m.C?v/m.C:0);
+  if(v>0&&v<m.F-0.5){const p=v/m.C;
+   if(mode==="even"){if(m.restr)pen+=p>=0.8?0.5:4;else if(!m.b)pen+=2}
+   else{if(m.restr)pen+=p>=0.8?3:7;else if(m.b)pen+=2;else pen+=5}}});
+ const cog=sum?mom/sum:0.5,spread=fills.length?Math.max(...fills)-Math.min(...fills):0;
+ return {s:pen+20*Math.abs(cog-target)+(mode==="even"?10*spread:0),cog,pen,spread};
+}
+// Wspólny stopień napełnienia w grupie; komory, którym wypada strefa zakazana 20–80% lub ponad maks., są przypinane do granicy.
+function equalShare(base,g,R,M,dir){
+ const x=base.slice(),fixed=new Map();
+ for(let it=0;it<=g.length;it++){
+  const free=g.filter(i=>!fixed.has(i));let rest=R;fixed.forEach(v=>rest-=v);
+  if(!free.length){if(Math.abs(rest)>1)return null;break}
+  const cg=free.reduce((s,i)=>s+M[i].C,0),f=rest/cg;let changed=false;
+  for(const i of free){const m=M[i],v=f*m.C;
+   if(v>m.F){fixed.set(i,m.F);changed=true}
+   else if(m.restr&&v>m.C*0.2&&v<m.C*0.8){fixed.set(i,dir>0?Math.ceil(m.C*0.8):Math.floor(m.C*0.2));changed=true}}
+  if(!changed){let used=0;free.forEach((i,k)=>{const v=k===free.length-1?rest-used:Math.round(f*M[i].C);used+=v;x[i]=v});break}
+ }
+ fixed.forEach((v,i)=>x[i]=v);
+ for(const i of g){const v=x[i];if(v<1||v>M[i].F+0.5||!okAmt(v,M[i]))return null}
+ return x;
+}
+// Każda komora: pusta / pełna / w grupie o wspólnym stopniu napełnienia; dodatkowo nierówny podział na 2 komory.
+function solve(V,M,target,collect,mode){
+ const n=M.length,out=[];V=Math.round(V);
+ const st=new Array(n).fill(0),total=Math.pow(3,n);
+ for(let code=0;code<total;code++){
+  let c=code,g=[],R=V;
+  for(let i=0;i<n;i++){st[i]=c%3;c=(c-st[i])/3;if(st[i]===1)R-=M[i].F;else if(st[i]===2)g.push(i)}
+  if(R<-0.5)continue;
+  const base=st.map((s,i)=>s===1?M[i].F:0);
+  if(!g.length){if(Math.abs(R)<=1){if(!collect)return true;out.push(base)}continue}
+  if(R<g.length)continue;
+  // wspólny stopień napełnienia
+  for(const dir of [1,-1]){const x=equalShare(base,g,R,M,dir);if(x){if(!collect)return true;out.push(x)}}
+  if(g.length===2){
+   const [i,j]=g,cand=new Set();
+   M[i].segs.forEach(s=>{for(let k=0;k<=40;k++)cand.add(Math.round(s[0]+(s[1]-s[0])*k/40))});
+   M[j].segs.forEach(s=>{cand.add(R-s[0]);cand.add(R-s[1])});
+   let best=null,bs=Infinity;
+   for(const xi of cand){const xj=R-xi;
+    if(xi<1||xj<1||xi>M[i].F+0.5||xj>M[j].F+0.5)continue;
+    if(!inSegs(xi,M[i].segs)||!inSegs(xj,M[j].segs))continue;
+    const y=base.slice();y[i]=xi;y[j]=xj;
+    if(!collect)return true;
+    const sc=evalAlloc(y,M,target,mode).s;if(sc<bs){bs=sc;best=y}}
+   if(best)out.push(best);
+  }
+ }
+ if(!collect)return false;
+ const scored=out.map(x=>({x,...evalAlloc(x,M,target,mode)})).sort((a,b)=>a.s-b.s);
+ const uniq=[];for(const r of scored){const key=r.x.map(v=>Math.round(v/100)).join(",");if(!uniq.some(u=>u.key===key))uniq.push({...r,key});if(uniq.length===3)break}
+ return uniq;
+}
+
+// ---- render wyniku
+function update(){
+ save();
+ $("targetVal").textContent=(+S.target)+"% długości";
+ document.querySelectorAll("#strat button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===S.strategy));
+ const P=params(),M=compModel(P.fmax),target=(+S.target)/100,mode=S.strategy;
+ const mass=+S.mass,msgs=[];
+ const capTot=M.reduce((s,m)=>s+m.C,0),fullTot=M.reduce((s,m)=>s+m.F,0);
+ const valid=P.d15>0&&P.fmax>0&&capTot>0&&mass>0;
+ const V=valid?mass/P.dt:0;
+ $("stats").innerHTML=[
+  [valid?fmt(V)+" l":"–","Objętość w "+fmt(P.t)+" °C"],
+  [valid?fmt(mass/P.d15)+" l":"–","Objętość w 15 °C"],
+  [P.dt>0?fmt(P.dt,4):"–","Gęstość w temp. kg/l"],
+  [P.fmax>0?fmt(P.fmax*100,1)+"%":"–","Maks. napełnienie"]
+ ].map(s=>`<div class="stat"><b>${s[0]}</b><span>${s[1]}</span></div>`).join("");
+ if(+S.payload>0&&mass>+S.payload)msgs.push(["bad",`Masa ${fmt(mass)} kg przekracza podaną ładowność ${fmt(+S.payload)} kg o ${fmt(mass-S.payload)} kg.`]);
+ let sols=[];
+ if(!valid){msgs.push(["info","Uzupełnij gęstość, temperaturę, komory i masę."])}
+ else if(V>fullTot+1){msgs.push(["bad",`Za dużo produktu. Przy maks. napełnieniu ${fmt(P.fmax*100,1)}% zmieścisz ${fmt(fullTot)} l, czyli ok. ${fmt(fullTot*P.dt)} kg. Nadwyżka: ${fmt((V-fullTot)*P.dt)} kg.`])}
+ else{
+  const ck=JSON.stringify([Math.round(V),M,target,mode]);if(ck!==solveCache.k){solveCache={k:ck,v:solve(V,M,target,true,mode)}}sols=solveCache.v;
+  if(!sols.length){
+   msgs.push(["bad","Tej masy nie da się rozłożyć bez naruszenia zasady 20/80 w komorach bez falochronów."]);
+   let lo=null,hi=null;
+   for(let k=1;k<=60&&(lo===null||hi===null);k++){const d=k*50;
+    if(lo===null&&mass-d>0&&solve((mass-d)/P.dt,M,target,false,mode))lo=mass-d;
+    if(hi===null&&(mass+d)/P.dt<=fullTot&&solve((mass+d)/P.dt,M,target,false,mode))hi=mass+d;}
+   if(lo!==null||hi!==null)msgs.push(["warn","Najbliższe masy, które da się poprawnie rozłożyć: "+[lo!==null?fmt(lo)+" kg":null,hi!==null?fmt(hi)+" kg":null].filter(Boolean).join(" lub ")+"."]);
+  }
+ }
+ lastSolutions=sols;
+ if(chosen!=="manual"&&chosen>=sols.length)chosen=0;
+ // przyciski wariantów
+ const vb=$("variants");vb.innerHTML="";
+ sols.forEach((s,i)=>{const b=document.createElement("button");b.type="button";b.textContent=i===0?"Wariant A · zalecany":"Wariant "+"ABC"[i];
+  b.setAttribute("aria-pressed",chosen===i);b.addEventListener("click",()=>{chosen=i;update()});vb.appendChild(b)});
+ if(capTot>0&&P.dt>0){const b=document.createElement("button");b.type="button";b.textContent="Ręcznie (kg)";b.setAttribute("aria-pressed",chosen==="manual");
+  b.addEventListener("click",()=>{chosen="manual";if(!S.manual.some(v=>+v>0)&&sols[0])copyVariant(sols[0],P);update()});vb.appendChild(b);
+  if(chosen==="manual"&&sols[0]){const c=document.createElement("button");c.type="button";c.textContent="Wczytaj wariant A";
+   c.addEventListener("click",()=>{copyVariant(sols[0],P);update()});vb.appendChild(c)}}
+ const manual=chosen==="manual";
+ let sol;
+ if(manual){
+  S.manual=M.map((_,i)=>+S.manual[i]||0);
+  const x=S.manual.map(kg=>P.dt>0?kg/P.dt:0);sol={x,...evalAlloc(x,M,target,mode)};
+ }else sol=sols[chosen];
+ drawTank(M,sol,target);
+ drawTable(M,sol,P,manual);
+ if(sol&&manual){
+  const sumKg=S.manual.reduce((a,b)=>a+b,0),diff=sumKg-mass;
+  if(mass>0&&Math.abs(diff)>=1)msgs.unshift([Math.abs(diff)>50?"warn":"info",(diff<0?`Wpisano ${fmt(sumKg)} kg, brakuje ${fmt(-diff)} kg do masy ${fmt(mass)} kg.`:`Wpisano ${fmt(sumKg)} kg, o ${fmt(diff)} kg więcej niż masa do załadunku (${fmt(mass)} kg).`)]);
+  M.forEach((m,i)=>{const v=sol.x[i];
+   if(v>m.F+0.5)msgs.unshift(["bad",`Komora ${i+1}: ${fmt(v/m.C*100,1)}% przekracza maks. napełnienie ${fmt(P.fmax*100,1)}%. Zmniejsz o ${fmt((v-m.F)*P.dt)} kg.`]);
+   else if(m.restr&&v>0.5&&!okAmt(v,m))msgs.unshift(["bad",`Komora ${i+1}: ${fmt(v/m.C*100,1)}% jest niedozwolone. Komora bez falochronów powyżej 7500 l: do ${fmt(m.C*0.2*P.dt)} kg (20%) albo od ${fmt(m.C*0.8*P.dt)} kg (80%).`]);});
+ }
+ if(sol){
+  M.forEach((m,i)=>{const v=sol.x[i];
+   if(v>0&&v<m.F-0.5&&!m.b&&!m.restr)msgs.push(["warn",`Komora ${i+1} jest częściowo napełniona i nie ma falochronów. Ładunek będzie się przelewał: hamuj i skręcaj łagodnie.`]);
+   if(m.restr&&v>0&&v/m.C<=0.2)msgs.push(["warn",`Komora ${i+1}: tylko ${fmt(v/m.C*100,0)}% w dużej komorze bez falochronów. Dozwolone, ale ładunek mocno się przelewa.`]);});
+  const dev=Math.abs(sol.cog-target)*100;
+  if(dev>10)msgs.push(["info",`Środek ciężkości wypada ${fmt(dev,0)} pkt % od celu.`+(manual?"":" Przy tej masie i tych komorach lepszy rozkład nie spełnia przepisów.")]);
+ }
+ if(S.nadr)msgs.push(["info","Produkt nie podlega ADR. Wzór napełnienia i zasada 20/80 są tu stosowane jako dobra praktyka (przelewanie ładunku działa tak samo), nie jako wymóg prawny. Sprawdź wymagania terminalu i klienta."]);
+ if(P.t>45)msgs.push(["warn",`Ładunek gorący (${fmt(P.t)} °C). Wzór ADR jest przeznaczony dla niższych temperatur i daje napełnienie bliskie 100%, dlatego ustaw limit terminalu (np. 98%). Podczas stygnięcia masa się nie zmienia, ale poziom w komorze spadnie.`]);
+ if(M.some(m=>m.restr&&P.fmax<0.8))msgs.push(["bad","Maks. napełnienie jest poniżej 80%, więc duże komory bez falochronów można napełnić tylko do 20%."]);
+ $("msgs").innerHTML=msgs.map(m=>`<li class="${m[0]}">${m[1]}</li>`).join("");
+}
+function copyVariant(sol,P){S.manual=sol.x.map(v=>Math.round(v*P.dt));$("tbl").dataset.key=""}
+function drawTank(M,sol,target){
+ const t=$("tank");t.innerHTML="";
+ M.forEach((m,i)=>{const v=sol?sol.x[i]:0,over=v>m.F+0.5;
+  const c=document.createElement("div");c.className="cell";c.style.flex=Math.max(m.C,1)+" 1 0";
+  c.innerHTML=`<div class="fill${over?" over":""}" style="height:${m.C?Math.min(v/m.C,1)*100:0}%"></div><div class="lim" style="bottom:${m.C?m.F/m.C*100:0}%"></div>${m.b?'<div class="baf"></div>':""}
+   <div class="lbl"><strong>${i+1}</strong>${sol?fmt(v/m.C*100,1)+"%":"–"}<br>${fmt(m.C)} l</div>`;
+  t.appendChild(c)});
+ const mk=(cls,p)=>{const e=document.createElement("div");e.className=cls;e.style.left=`calc(10px + (100% - 20px) * ${p})`;t.appendChild(e)};
+ mk("cog t",target); if(sol&&sol.x.some(v=>v>0))mk("cog",sol.cog);
+}
+function statusPill(m,v,sol){
+ if(!sol)return '<span class="pill p-mut">–</span>';
+ if(v<=0.5)return '<span class="pill p-mut">pusta</span>';
+ if(v>m.F+0.5)return '<span class="pill p-bad">ponad maks.</span>';
+ if(m.restr&&!okAmt(v,m))return '<span class="pill p-bad">zakaz 20–80%</span>';
+ if(v>=m.F-0.5)return '<span class="pill p-ok">pełna</span>';
+ if(m.b)return '<span class="pill p-ok">częściowa · falochrony</span>';
+ if(m.restr)return `<span class="pill p-warn">${v/m.C>=0.8?"≥ 80%":"≤ 20%"} · bez falochr.</span>`;
+ return '<span class="pill p-warn">częściowa · bez falochr.</span>';
+}
+function drawTable(M,sol,P,manual){
+ const tb=$("tbl"),key=M.length+"|"+manual;
+ if(tb.dataset.key!==key){
+  let h=`<thead><tr><th>Komora</th><th>Pojemność</th><th>Masa (kg)</th><th>Załadunek (l)</th><th>Napełn.</th><th>Status</th></tr></thead><tbody>`;
+  M.forEach((m,i)=>{h+=`<tr><td>${i+1}${m.b?"":" <span class='hint'>bez fal.</span>"}</td><td id="c-c${i}"></td>
+   <td>${manual?`<input type="number" class="kg" id="mk${i}" min="0" step="10" inputmode="numeric" value="${S.manual[i]||""}" placeholder="0" aria-label="Masa w komorze ${i+1} w kg">`:`<span id="c-kg${i}"></span>`}</td>
+   <td id="c-l${i}"></td><td id="c-p${i}"></td><td class="st" id="c-st${i}"></td></tr>`});
+  h+=`</tbody><tfoot><tr><td>Razem</td><td id="f-c"></td><td id="f-kg"></td><td id="f-l"></td><td id="f-p"></td><td></td></tr></tfoot>`;
+  tb.innerHTML=h;tb.dataset.key=key;
+  if(manual)M.forEach((m,i)=>$("mk"+i).addEventListener("input",e=>{S.manual[i]=Math.max(0,+e.target.value||0);update()}));
+ }
+ let sv=0,sm=0;
+ M.forEach((m,i)=>{const v=sol?sol.x[i]:0,kg=v*P.dt;sv+=v;sm+=kg;
+  $("c-c"+i).textContent=fmt(m.C)+" l";
+  if(!manual)$("c-kg"+i).textContent=sol?fmt(kg):"–";
+  else{const inp=$("mk"+i);if(document.activeElement!==inp&&+inp.value!==S.manual[i])inp.value=S.manual[i]||""}
+  $("c-l"+i).textContent=sol?fmt(v):"–";
+  $("c-p"+i).textContent=sol?fmt(m.C?v/m.C*100:0,1)+"%":"–";
+  $("c-st"+i).innerHTML=statusPill(m,v,sol)});
+ const capTot=M.reduce((s,m)=>s+m.C,0);
+ $("f-c").textContent=fmt(capTot)+" l";$("f-kg").textContent=sol?fmt(sm):"–";$("f-l").textContent=sol?fmt(sv):"–";$("f-p").textContent=sol&&capTot?fmt(sv/capTot*100,1)+"%":"";
+}
+
+// ---- Zapytaj Claude (opcjonalne)
+let sample=null;
+(async()=>{try{sample=window.claude?await window.claude.use("sample"):null}catch(e){sample=null}
+ if(sample)$("askBox").hidden=false})();
+$("askBtn").addEventListener("click",async()=>{
+ const name=$("askName").value.trim();if(!name||!sample)return;
+ const note=$("askNote");note.hidden=false;note.textContent="Szukam danych produktu…";$("askBtn").disabled=true;
+ try{
+  const r=await sample(`Jesteś ekspertem ADR. Podaj typowe dane produktu chemicznego przewożonego w cysternie: "${name}".
+Odpowiedz WYŁĄCZNIE obiektem JSON bez komentarzy:
+{"nazwa":"nazwa po polsku","d15":gęstość w 15°C w kg/l (liczba),"alfa":współczynnik objętościowej rozszerzalności cieplnej w 1/°C (liczba),"un":"numer UN lub pusty","kemler":"numer rozpoznawczy zagrożenia lub pusty","toksyczny":true/false,"zracy":true/false,"lepki":true jeśli lepkość w 20°C ≥ 2680 mm2/s,"uwagi":"jedno krótkie zdanie po polsku o niepewności danych"}
+Jeśli nie znasz produktu, zwróć {"blad":"krótki opis"}.`,{modelTier:"default"});
+  const m=r.text.match(/\{[\s\S]*\}/);const j=m?JSON.parse(m[0]):null;
+  if(!j||j.blad||!(j.d15>0)){note.textContent="Nie udało się ustalić danych"+(j&&j.blad?": "+j.blad:"")+". Wpisz gęstość ręcznie.";return}
+  S.prod="custom";S.d15=+(+j.d15).toFixed(4);S.alpha=+(+j.alfa||0.0006).toFixed(5);
+  S.kform=(j.toksyczny||j.zracy)?"98":"100";S.visc=!!j.lepki;S.un=j.un||"";S.ke=j.kemler||"";S.nadr=!j.un;
+  loadForm();update();
+  note.textContent=`${j.nazwa||name}: dane oszacowane przez Claude na podstawie wiedzy ogólnej, nie z bazy terminalu. ${j.uwagi||""} Porównaj z dokumentem załadunkowym.`;
+ }catch(e){note.textContent=e&&e.code==="rate_limited"?"Zbyt wiele zapytań. Spróbuj za chwilę.":"Zapytanie się nie powiodło. Wpisz dane ręcznie."}
+ finally{$("askBtn").disabled=false}
+});
+
+loadForm();update();
+</script>
+
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+</script>
+</body>
+</html>
