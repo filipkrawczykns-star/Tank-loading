@@ -46,14 +46,22 @@ h1{font-family:var(--f-display);font-weight:700;font-size:2rem;line-height:1;mar
 .chip{font-size:.8rem;font-weight:600;padding:4px 10px;border-radius:12px;border:1px solid var(--warn);color:var(--warn);background:transparent;cursor:pointer}
 .grid{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:18px;align-items:start}
 @media (max-width:880px){.grid{grid-template-columns:minmax(0,1fr)}}
-section,details.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
-details.panel{display:block}
-details.panel > summary{cursor:pointer;list-style:none;font-family:var(--f-display);font-weight:600;font-size:1.25rem;text-transform:uppercase;letter-spacing:.02em;display:flex;align-items:baseline;gap:8px}
-details.panel > summary::-webkit-details-marker{display:none}
-details.panel > summary::after{content:"+";margin-left:auto;color:var(--muted);font-family:var(--f-mono)}
-details.panel[open] > summary::after{content:"–"}
-details.panel > summary small{font-family:var(--f-body);text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted);font-size:.85rem}
-.pbody{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+section,details.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:0;min-width:0}
+details.panel > summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;padding:14px 16px;-webkit-tap-highlight-color:transparent}
+details.panel > summary::-webkit-details-marker,details.subfold > summary::-webkit-details-marker{display:none}
+details.panel > summary h2{order:1;flex:1;min-width:0}
+details.panel > summary::after,details.subfold > summary::after{content:"";order:2;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin:0 4px 4px;transition:transform .2s}
+details[open] > summary::after{transform:rotate(-135deg);margin-bottom:-4px}
+.fsum{order:3;flex-basis:100%;font-size:.86rem;color:var(--muted);overflow-wrap:anywhere}
+details[open] > summary .fsum{display:none}
+details.panel > .pbody{padding:0 16px 16px;margin-top:0}
+details.panel.bottom{margin-top:18px}
+details.subfold{border-top:1px solid var(--line);padding-top:4px}
+details.subfold > summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;padding:10px 0}
+details.subfold > summary h3{flex:1}
+details.subfold > summary h3 small{font-family:var(--f-body);text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted);font-size:.85rem}
+details.subfold > .pbody{margin-top:4px}
+.pbody{display:flex;flex-direction:column;gap:12px}
 .col{display:flex;flex-direction:column;gap:18px;min-width:0}
 h2{font-family:var(--f-display);font-weight:600;font-size:1.25rem;margin:0;letter-spacing:.02em;text-transform:uppercase;display:flex;align-items:baseline;gap:8px}
 h2 small{font-family:var(--f-body);text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted);font-size:.85rem}
@@ -76,7 +84,8 @@ button:disabled{opacity:.45;cursor:default}
 .btn-accent{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .btn-danger{border-color:var(--bad);color:var(--bad)}
 .toolbar{display:flex;gap:8px;flex-wrap:wrap}
-.prod-top{display:flex;gap:12px;align-items:flex-end}
+.prod-top{display:flex;gap:12px;align-items:flex-start}
+.prod-top .plate{margin-top:22px}
 .prod-top > div:first-child{flex:1;min-width:0}
 .plate{flex:none;width:66px;border:3px solid #111;border-radius:3px;background:#f28c00;color:#111;font-family:var(--f-mono);font-weight:500;text-align:center}
 .plate div{padding:2px 0;font-size:.95rem;line-height:1.2;min-height:1.5em}
@@ -86,8 +95,10 @@ button:disabled{opacity:.45;cursor:default}
 .note.warn{border-color:var(--warn)}
 /* Combobox */
 .combo{position:relative}
-.combo-list{position:absolute;left:0;right:0;top:100%;z-index:30;background:var(--surface);border:1px solid var(--line);border-radius:6px;box-shadow:0 10px 28px var(--shadow);max-height:min(60vh,380px);overflow:auto;margin:4px 0 0;padding:4px;list-style:none}
-.opt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1px 10px;padding:8px 10px;border-radius:4px;cursor:pointer}
+.combo-list{background:var(--surface);border:1px solid var(--accent);border-radius:6px;margin:6px 0 0;padding:4px;list-style:none}
+.opt-bar{display:flex;justify-content:space-between;align-items:center;padding:4px 4px 4px 10px;font-size:.75rem;color:var(--muted)}
+.opt-bar button{padding:6px 12px;font-size:.85rem}
+.opt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1px 10px;padding:10px 10px;border-radius:4px;cursor:pointer;border-top:1px solid var(--line)}
 .opt[aria-selected=true],.opt:hover{background:var(--bg)}
 .opt .on{font-weight:600;overflow-wrap:anywhere}
 .opt .meta{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);text-align:right;white-space:nowrap}
@@ -209,8 +220,9 @@ input.kg{width:100px;padding:6px 8px;text-align:right;border-color:var(--accent)
 
 <div class="grid">
 <div class="col">
-  <section aria-labelledby="h-tr">
-    <h2 id="h-tr">1. Naczepa</h2>
+  <details class="panel" id="f-tr" data-fold="tr">
+    <summary><h2>1. Naczepa</h2><span class="fsum" id="sum-tr"></span></summary>
+    <div class="pbody">
     <div class="combo" id="trCombo">
       <label for="trSearch">Wybierz naczepę (nr boczny lub rejestracja)</label>
       <input type="search" id="trSearch" autocomplete="off" placeholder="np. 4127 lub OR-123">
@@ -229,16 +241,30 @@ input.kg{width:100px;padding:6px 8px;text-align:right;border-color:var(--accent)
       <button type="button" id="trDel" class="btn-danger">Usuń naczepę</button>
     </div>
     <p class="hint">Komora bez falochronów o pojemności powyżej 7500 l może być napełniona tylko do 20% lub od 80%.</p>
-  </section>
+    </div>
+  </details>
 
-  <section aria-labelledby="h-load">
-    <h2 id="h-load">2. Produkty <small>do 4, każdy w osobnych komorach</small></h2>
+  <details class="panel" id="f-load" data-fold="load">
+    <summary><h2>2. Produkty</h2><span class="fsum" id="sum-load"></span></summary>
+    <div class="pbody">
+    <p class="hint">Do 4 produktów, każdy w osobnych komorach.</p>
     <div class="loads" id="loads"></div>
     <button type="button" id="addLoad">+ Dodaj produkt</button>
-  </section>
+    <details class="subfold" id="myPanel" data-fold="my">
+      <summary><h3>Moje produkty <small id="myCount"></small></h3></summary>
+      <div class="pbody">
+        <p class="hint">Produkty, które wozisz, z gęstością z dokumentów terminalu. W wyszukiwarce są pokazywane jako pierwsze.</p>
+        <div class="mylist" id="myList"></div>
+        <div class="form" id="myForm" hidden></div>
+        <div><button type="button" id="myAdd">+ Dodaj mój produkt</button></div>
+      </div>
+    </details>
+    </div>
+  </details>
 
-  <section aria-labelledby="h-dist">
-    <h2 id="h-dist">3. Rozmieszczenie</h2>
+  <details class="panel" id="f-dist" data-fold="dist">
+    <summary><h2>3. Rozmieszczenie</h2><span class="fsum" id="sum-dist"></span></summary>
+    <div class="pbody">
     <div>
       <label id="strat-l">Sposób rozłożenia</label>
       <div class="seg wide" id="strat" role="group" aria-labelledby="strat-l">
@@ -251,41 +277,15 @@ input.kg{width:100px;padding:6px 8px;text-align:right;border-color:var(--accent)
       <input type="range" id="target" min="0" max="100" step="1">
       <div class="ends"><span>Przód (siodło)</span><span>Środek</span><span>Tył (osie naczepy)</span></div>
     </div>
-  </section>
-
-  <details class="panel" id="myPanel">
-    <summary>Moje produkty <small id="myCount"></small></summary>
-    <div class="pbody">
-      <p class="hint">Produkty, które wozisz, z gęstością z dokumentów terminalu. W wyszukiwarce są pokazywane jako pierwsze.</p>
-      <div class="mylist" id="myList"></div>
-      <div class="form" id="myForm" hidden></div>
-      <div><button type="button" id="myAdd">+ Dodaj mój produkt</button></div>
-    </div>
-  </details>
-
-  <details class="panel" id="bkPanel">
-    <summary>Kopia zapasowa <small id="bkSum"></small></summary>
-    <div class="pbody">
-      <ul class="status" id="bkStatus"></ul>
-      <div class="toolbar">
-        <button type="button" class="btn-accent" id="bkShare">Udostępnij kopię (plik)</button>
-        <button type="button" id="bkCopy">Kopiuj jako tekst</button>
-      </div>
-      <p class="note" id="bkMsg" hidden></p>
-      <textarea id="bkText" hidden readonly aria-label="Kopia zapasowa jako tekst"></textarea>
-      <h3>Przywróć</h3>
-      <div><label for="bkFile">Wczytaj plik kopii</label><input type="file" id="bkFile" accept=".json,.txt,application/json,text/plain"></div>
-      <textarea id="bkPaste" placeholder="…albo wklej tutaj tekst kopii (zaczyna się od KOMORY:)" aria-label="Wklej tekst kopii"></textarea>
-      <div class="toolbar"><button type="button" id="bkPasteBtn">Wczytaj wklejony tekst</button></div>
-      <div class="form" id="bkConfirm" hidden></div>
-      <p class="hint">Kopia zawiera naczepy i Twoje produkty. Zapisz ją np. na Google Drive, w e-mailu do siebie albo w notatkach.</p>
     </div>
   </details>
 </div>
 
 <div class="col">
-  <section aria-labelledby="h-res">
-    <h2 id="h-res">Plan załadunku <small id="resTrailer"></small></h2>
+  <details class="panel" id="f-res" data-fold="res">
+    <summary><h2>4. Plan załadunku</h2><span class="fsum" id="sum-res"></span></summary>
+    <div class="pbody">
+    <p class="hint" id="resTrailer"></p>
     <div class="stats" id="stats"></div>
     <div class="psum" id="psum"></div>
     <div class="variants" id="variants"></div>
@@ -301,18 +301,40 @@ input.kg{width:100px;padding:6px 8px;text-align:right;border-color:var(--accent)
     </div>
     <div class="tablebox"><table id="tbl"></table></div>
     <ul class="msgs" id="msgs" aria-live="polite"></ul>
-  </section>
-  <p class="foot">Gęstości w bazie są typowe. Do obliczeń wpisz gęstość z dokumentu załadunkowego terminalu. Kalkulator nie zna nacisków na osie Twojego zestawu: środek ciężkości liczony jest wzdłuż zbiornika, przy założeniu stałego przekroju komór. Przed odjazdem sprawdź naciski i stosuj się do instrukcji terminalu.</p>
+    <p class="foot">Gęstości w bazie są typowe. Do obliczeń wpisz gęstość z dokumentu załadunkowego terminalu. Kalkulator nie zna nacisków na osie Twojego zestawu: środek ciężkości liczony jest wzdłuż zbiornika, przy założeniu stałego przekroju komór. Przed odjazdem sprawdź naciski i stosuj się do instrukcji terminalu.</p>
+    </div>
+  </details>
 </div>
 </div>
+
+<details class="panel bottom" id="bkPanel" data-fold="bk">
+  <summary><h2>Kopia zapasowa</h2><span class="fsum" id="bkSum"></span></summary>
+  <div class="pbody">
+    <ul class="status" id="bkStatus"></ul>
+    <div class="toolbar">
+      <button type="button" class="btn-accent" id="bkShare">Udostępnij kopię (plik)</button>
+      <button type="button" id="bkCopy">Kopiuj jako tekst</button>
+    </div>
+    <p class="note" id="bkMsg" hidden></p>
+    <textarea id="bkText" hidden readonly aria-label="Kopia zapasowa jako tekst"></textarea>
+    <h3>Przywróć</h3>
+    <div><label for="bkFile">Wczytaj plik kopii</label><input type="file" id="bkFile" accept=".json,.txt,application/json,text/plain"></div>
+    <textarea id="bkPaste" placeholder="…albo wklej tutaj tekst kopii (zaczyna się od KOMORY:)" aria-label="Wklej tekst kopii"></textarea>
+    <div class="toolbar"><button type="button" id="bkPasteBtn">Wczytaj wklejony tekst</button></div>
+    <div class="form" id="bkConfirm" hidden></div>
+    <p class="hint">Kopia zawiera naczepy i Twoje produkty. Zapisz ją np. na Google Drive, w e-mailu do siebie albo w notatkach.</p>
+  </div>
+</details>
 </div>
 
 <div class="updbar" id="updbar" hidden><span>Dostępna nowa wersja aplikacji.</span><button type="button" id="updBtn">Odśwież</button></div>
 
 <script>
 "use strict";
-const APP_VERSION="2.0", APP_DATE="31.10.2026", SCHEMA=3, KEY="cysterna-v3";
-const WHATSNEW=["Kilka produktów w jednej cysternie, każdy w osobnych komorach","Zapisane naczepy z numerem bocznym i rejestracyjnym","Wyszukiwarka produktów po nazwie (PL/NL/EN) lub numerze UN, baza ok. 100 produktów","„Moje produkty” z gęstością z dokumentów","Kopia zapasowa do pliku lub jako tekst","Twoje dotychczasowe ustawienia zostały przeniesione"];
+const APP_VERSION="2.1", APP_DATE="31.10.2026", SCHEMA=3, KEY="cysterna-v3";
+const WHATSNEW={"2.1":["Sekcje zwijane stuknięciem w nagłówek, zwinięta sekcja pokazuje podsumowanie","„Moje produkty” w sekcji Produkty, kopia zapasowa na dole strony","Wyszukiwarka: wyniki pod polem, przewijanie nie wybiera produktu ani nie zamyka listy"],
+ "2.0":["Kilka produktów w jednej cysternie, każdy w osobnych komorach","Zapisane naczepy z numerem bocznym i rejestracyjnym","Wyszukiwarka produktów po nazwie (PL/NL/EN) lub numerze UN, baza ok. 100 produktów","„Moje produkty” z gęstością z dokumentów","Kopia zapasowa do pliku lub jako tekst"]};
+const verNum=v=>String(v||"0").split(".").reduce((a,x)=>a*100+(+x||0),0)*(String(v||"0").split(".").length<2?100:1);
 
 // ---- Baza produktów: d = gęstość w 15 °C (kg/l, typowa), a = α (1/°C), k = wzór ADR 4.3.2.2.1, al = nazwy zastępcze (PL/NL/EN), gen = pozycja ogólna
 const DB=[
@@ -437,7 +459,7 @@ function exampleState(){
  const tid=uid("t");
  return {schema:SCHEMA,trailers:[{id:tid,fleet:"Przykład",reg:"",payload:"",comps:[{c:9500,b:true},{c:7000,b:false},{c:6500,b:false},{c:9500,b:false}]}],
   trailerId:tid,myProducts:[],recent:[],loads:[loadFromProduct({...b("diesel"),id:"b:diesel"},16000),loadFromProduct({...b("petrol"),id:"b:petrol"},6500)],
-  target:50,strategy:"even",manual:[],dirty:false,lastBackup:0,seenVersion:""};
+  target:50,strategy:"even",manual:[],dirty:false,lastBackup:0,seenVersion:"",folds:{tr:false,load:true,my:false,dist:false,res:true,bk:false}};
 }
 function fromV1(o){
  const S=exampleState(),t=S.trailers[0];
@@ -458,8 +480,10 @@ function loadState(){
  if(raw)lsSet("cysterna-uszkodzony-zapis",raw);
  return exampleState();
 }
+const FOLD_DEFAULT={tr:false,load:true,my:false,dist:false,res:true,bk:false};
 function sanitize(s){
  const d=exampleState();
+ if(!s.folds||typeof s.folds!=="object")s.folds={...FOLD_DEFAULT};
  for(const k of Object.keys(d))if(s[k]===undefined)s[k]=d[k];
  if(!s.trailers.some(t=>t.id===s.trailerId))s.trailerId=s.trailers[0].id;
  if(!Array.isArray(s.loads)||!s.loads.length)s.loads=[loadFromProduct({...DB[0],id:"b:diesel"},0)];
@@ -474,35 +498,43 @@ function save(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>lsSet(KEY,JSON.
 function markDirty(){S.dirty=true;renderBackupState()}
 window.addEventListener("pagehide",()=>lsSet(KEY,JSON.stringify(S)));
 
-// ---- Combobox (wyszukiwarka z listą trafień)
+// ---- Combobox: wyniki pod polem, w treści strony. Wybór dopiero po stuknięciu (nie przy przewijaniu).
+const combos=[];
+function closeOtherCombos(target){for(const c of combos.slice()){if(!c.box.isConnected){combos.splice(combos.indexOf(c),1);continue}if(c.isOpen()&&!c.box.contains(target))c.close()}}
+document.addEventListener("pointerdown",e=>closeOtherCombos(e.target),true);
+document.addEventListener("focusin",e=>closeOtherCombos(e.target));
 function makeCombo(input,{items,onPick,display}){
  const box=input.parentElement,list=document.createElement("ul");
  list.className="combo-list";list.setAttribute("role","listbox");list.id=input.id+"-list";list.hidden=true;box.appendChild(list);
  input.setAttribute("role","combobox");input.setAttribute("aria-autocomplete","list");input.setAttribute("aria-controls",list.id);input.setAttribute("aria-expanded","false");
  let cur=[],act=-1,open=false;
  function render(){
-  const q=open&&input.dataset.typed==="1"?input.value:"";
-  cur=items(q);act=cur.findIndex(x=>!x.head);let h="";
+  const q=input.dataset.typed==="1"?input.value:"";
+  cur=items(q);act=cur.findIndex(x=>!x.head);
+  let h=`<li class="opt-bar" role="presentation"><span>${q?"Wyniki":"Wybierz z listy lub wpisz"}</span><button type="button" data-close="1">Zamknij ✕</button></li>`;
   cur.forEach((it,i)=>{if(it.head){h+=`<li class="opt-head" role="presentation">${esc(it.head)}</li>`;return}
    h+=`<li class="opt${it.action?" act":""}" role="option" id="${list.id}-${i}" data-i="${i}" aria-selected="${i===act}">${it.html}</li>`});
-  list.innerHTML=h||`<li class="opt-head" role="presentation">Brak wyników</li>`;
-  list.hidden=false;input.setAttribute("aria-expanded","true");mark();
+  if(!cur.length)h+=`<li class="opt-head" role="presentation">Brak wyników</li>`;
+  list.innerHTML=h;list.hidden=false;input.setAttribute("aria-expanded","true");mark(false);
  }
- function mark(){list.querySelectorAll(".opt").forEach(el=>el.setAttribute("aria-selected",+el.dataset.i===act));
-  const el=list.querySelector(`[data-i="${act}"]`);if(el){input.setAttribute("aria-activedescendant",el.id);el.scrollIntoView({block:"nearest"})}}
- function close(){open=false;list.hidden=true;input.setAttribute("aria-expanded","false");input.dataset.typed="";input.value=display()}
- function pick(i){const it=cur[i];if(!it||it.head)return;close();onPick(it);input.blur()}
- input.addEventListener("focus",()=>{open=true;input.dataset.typed="";render();setTimeout(()=>{try{input.select()}catch(e){}},0)});
+ function mark(scroll){list.querySelectorAll(".opt").forEach(el=>el.setAttribute("aria-selected",+el.dataset.i===act));
+  const el=list.querySelector(`[data-i="${act}"]`);if(el){input.setAttribute("aria-activedescendant",el.id);if(scroll)el.scrollIntoView({block:"nearest"})}}
+ function close(){if(!open&&list.hidden)return;open=false;list.hidden=true;input.setAttribute("aria-expanded","false");input.dataset.typed="";input.value=display()}
+ function pick(i){const it=cur[i];if(!it||it.head)return;close();input.blur();onPick(it)}
+ input.addEventListener("focus",()=>{if(open)return;open=true;input.dataset.typed="";render();setTimeout(()=>{try{input.select()}catch(e){}},0)});
+ input.addEventListener("click",()=>{if(!open){open=true;input.dataset.typed="";render()}});
  input.addEventListener("input",()=>{open=true;input.dataset.typed="1";render()});
  input.addEventListener("keydown",e=>{
   if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();if(!open){open=true;render()}const step=e.key==="ArrowDown"?1:-1;let i=act;
-   for(let n=0;n<cur.length;n++){i=(i+step+cur.length)%cur.length;if(!cur[i].head){act=i;break}}mark()}
+   for(let n=0;n<cur.length;n++){i=(i+step+cur.length)%cur.length;if(!cur[i].head){act=i;break}}mark(true)}
   else if(e.key==="Enter"){if(open&&act>=0){e.preventDefault();pick(act)}}
-  else if(e.key==="Escape"){close();input.blur()}});
- input.addEventListener("blur",()=>setTimeout(()=>{if(document.activeElement!==input)close()},150));
- list.addEventListener("pointerdown",e=>{const el=e.target.closest(".opt");if(el){e.preventDefault();pick(+el.dataset.i)}});
+  else if(e.key==="Escape"){close();input.blur()}
+  else if(e.key==="Tab")close()});
+ list.addEventListener("click",e=>{if(e.target.closest("[data-close]")){close();return}const el=e.target.closest(".opt");if(el)pick(+el.dataset.i)});
  input.value=display();
- return {refresh:()=>{if(!open)input.value=display()}};
+ const api={box,isOpen:()=>open,close,refresh:()=>{if(!open)input.value=display()}};
+ combos.push(api);
+ return api;
 }
 
 // ---- Wyszukiwanie produktów
@@ -530,6 +562,7 @@ function searchProducts(q){
   if(!toks.every(t=>hay.includes(t)))continue;
   let r=5;
   if(digits&&p.un===digits)r=0;else if(digits&&p.un&&p.un.startsWith(digits))r=1;
+  else if(hay.split(/[\s(),\/–-]+/).includes(nq))r=1.5;
   else if(nn.startsWith(toks[0]))r=2;else if(nn.split(/[\s(\/,–-]+/).some(w=>w.startsWith(toks[0])))r=3;else if(nn.includes(toks[0]))r=4;
   res.push({p,r:r-(p.my?0.5:0)+(p.gen?0.3:0),o:all.indexOf(p)});
  }
@@ -777,7 +810,7 @@ function renderMy(){
 }
 function openMyForm(id,pre){
  const p=id?S.myProducts.find(x=>x.id===id):{n:"",al:"",un:"",ke:"",c:"",d:"",a:0.0008,k:100,visc:0,lim:"",...(pre||{})};
- const f=$("myForm");$("myPanel").open=true;f.hidden=false;
+ const f=$("myForm");openFold("myPanel");f.hidden=false;
  const kf=[["100","100 · zapalne / bez zagrożeń dodatkowych"],["98","98 · toksyczne lub żrące"],["97","97 · zbiornik hermetyczny, zapalne"],["95","95 · zbiornik hermetyczny, toks./żrące"]]
   .map(([v,t])=>`<option value="${v}"${String(p.k)===v?" selected":""}>${t}</option>`).join("");
  f.innerHTML=`<h3>${id?"Edytuj mój produkt":"Nowy mój produkt"}</h3>
@@ -864,7 +897,7 @@ function offerImport(o){
 function initBackupUI(){
  $("bkShare").addEventListener("click",shareBackup);
  $("bkCopy").addEventListener("click",copyBackup);
- $("backupChip").addEventListener("click",()=>{$("bkPanel").open=true;$("bkPanel").scrollIntoView({behavior:"smooth",block:"start"})});
+ $("backupChip").addEventListener("click",()=>{openFold("bkPanel");$("bkPanel").scrollIntoView({behavior:"smooth",block:"start"})});
  $("bkPasteBtn").addEventListener("click",()=>{const o=parseBackup($("bkPaste").value);if(!o){bkMsg("To nie jest poprawny tekst kopii. Powinien zaczynać się od KOMORY:");return}bkMsg("");offerImport(o)});
  $("bkFile").addEventListener("change",e=>{const file=e.target.files&&e.target.files[0];if(!file)return;const r=new FileReader();
   r.onload=()=>{const o=parseBackup(r.result);e.target.value="";if(!o){bkMsg("Ten plik nie jest kopią kalkulatora.");return}bkMsg("");offerImport(o)};r.readAsText(file)});
@@ -878,7 +911,7 @@ function update(){
  $("targetVal").textContent=(+S.target)+"% długości";
  document.querySelectorAll("#strat button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===S.strategy));
  const t=T(),cb=compBase(),n=cb.length,target=(+S.target)/100,mode=S.strategy;
- $("resTrailer").textContent=trailerLabel(t);
+ $("resTrailer").textContent="Naczepa: "+trailerLabel(t);
  const LPs=S.loads.map(lp),MP=LPs.map(P=>compFor(cb,P)),msgs=[];
  LPs.forEach((P,i)=>{const el=$(`l${i}-sum`);if(el)el.textContent=P.ok?`ρ ${fmt(P.dt,4)} kg/l w ${fmt(P.t)} °C · maks. ${fmt(P.fmax*100,1)}%`:"uzupełnij gęstość"});
  const capTot=cb.reduce((s,m)=>s+m.C,0),totMass=LPs.reduce((s,P)=>s+P.mass,0),totV=LPs.reduce((s,P)=>s+P.V,0);
@@ -954,6 +987,12 @@ function update(){
  LPs.forEach((P,p)=>{if(P.mass>0&&P.t>45)msgs.push(["warn",`${pname(p)}: ładunek gorący (${fmt(P.t)} °C). Wzór ADR daje tu napełnienie bliskie 100%, ustaw limit terminalu (np. 98%). Po ostygnięciu poziom w komorze spadnie.`])});
  LPs.forEach((P,p)=>{if(P.mass>0&&MP[p].some(m=>m.restr)&&P.fmax<0.8)msgs.push(["bad",`${pname(p)}: maks. napełnienie poniżej 80%, więc duże komory bez falochronów można napełnić tylko do 20%.`])});
  $("msgs").innerHTML=msgs.map(m=>`<li class="${m[0]}">${m[1]}</li>`).join("");
+ // podsumowania zwiniętych sekcji
+ $("sum-tr").textContent=`${trailerLabel(t)} · ${n} ${n===1?"komora":n<5?"komory":"komór"} · ${fmt(capTot)} l`+(payload?` · ładowność ${fmt(payload)} kg`:"");
+ $("sum-load").textContent=S.loads.map(L=>`${L.name} ${L.mass?fmt(+L.mass)+" kg":"(brak masy)"}`).join(" · ");
+ $("sum-dist").textContent=`${S.strategy==="even"?"Równomiernie":"Najmniej częściowych komór"} · cel ${+S.target}% długości`;
+ const bad=msgs.filter(m=>m[0]==="bad").length;
+ $("sum-res").textContent=sol&&sol.mass>0?`${manual?"Ręcznie":"Wariant "+"ABC"[chosen]} · ${fmt(sol.mass)} kg w ${used} z ${n} komór`+(bad?` · ${bad} ${bad===1?"problem":"problemy"}`:""):(bad?"Brak poprawnego planu, rozwiń, aby zobaczyć powód":"Brak planu");
 }
 function copyVariant(sol,LPs){S.manual=sol.x.map((v,i)=>({p:sol.own[i],kg:sol.own[i]>=0?Math.round(v*LPs[sol.own[i]].dt):0}));$("tbl").dataset.key=""}
 function drawTank(cb,MP,sol,target,LPs){
@@ -1016,12 +1055,18 @@ function initGeneral(){
   const q=$(`l${S.loads.length-1}-q`);if(q)q.focus()});
  $("myAdd").addEventListener("click",()=>openMyForm(null,{}));
  if(S.seenVersion!==APP_VERSION){
-  $("wnTitle").textContent=S.seenVersion?`Nowości w wersji ${APP_VERSION}`:`Kalkulator komór ${APP_VERSION}`;
-  $("wnList").innerHTML=WHATSNEW.filter(w=>S.seenVersion||!w.startsWith("Twoje")).map(w=>`<li>${esc(w)}</li>`).join("");
-  $("whatsnew").hidden=false;
+  const items=Object.keys(WHATSNEW).filter(v=>verNum(v)>verNum(S.seenVersion)).flatMap(v=>WHATSNEW[v]);
+  if(S.seenVersion==="1")items.push("Twoje dotychczasowe ustawienia zostały przeniesione");
+  $("wnTitle").textContent=`Nowości w wersji ${APP_VERSION}`;
+  $("wnList").innerHTML=items.map(w=>`<li>${esc(w)}</li>`).join("");
+  $("whatsnew").hidden=!items.length;
   $("wnOk").addEventListener("click",()=>{S.seenVersion=APP_VERSION;save();$("whatsnew").hidden=true});
  }
+ // zwijane sekcje: stan zapamiętany
+ document.querySelectorAll("details[data-fold]").forEach(d=>{const k=d.dataset.fold;d.open=S.folds[k]!==undefined?!!S.folds[k]:!!FOLD_DEFAULT[k];
+  d.addEventListener("toggle",()=>{S.folds[k]=d.open;save()})});
 }
+function openFold(id){let el=$(id);while(el){if(el.tagName==="DETAILS")el.open=true;el=el.parentElement}}
 initTrailerUI();initBackupUI();initGeneral();renderAll();
 
 (async()=>{try{if(navigator.storage&&navigator.storage.persist){persistState=(await navigator.storage.persisted())||(await navigator.storage.persist())?"on":"off"}else persistState="na"}catch(e){persistState="na"}renderBackupState()})();
@@ -1029,7 +1074,6 @@ initTrailerUI();initBackupUI();initGeneral();renderAll();
  try{sample=await window.claude.use("sample")}catch(e){sample=null}
  try{downloads=await window.claude.use("downloads")}catch(e){downloads=null}})();
 </script>
-
 <script>
 // Instalowana wersja: service worker (offline) i sprawdzanie nowej wersji
 if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}

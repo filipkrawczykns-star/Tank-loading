@@ -1,7 +1,7 @@
 // Kalkulator komór: service worker.
 // Strona: najpierw sieć (zawsze najnowsza wersja), bez zasięgu: kopia z pamięci.
 // Zmień CACHE przy każdym wydaniu: stare pliki zostaną posprzątane. Dane użytkownika (naczepy, produkty) nie są tu przechowywane i nie są usuwane.
-const CACHE="komory-v2.0";
+const CACHE="komory-v2.1";
 const CORE=["./","index.html","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/icon-180.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith("komory-")&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
