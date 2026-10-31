@@ -8,106 +8,157 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Komory">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-family:system-ui,sans-serif;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: narzędzie dwukolumnowe (dane | wynik), na telefonie jedna kolumna; akcent = pomarańcz tablicy ADR */
+/* Layout: narzędzie dwukolumnowe (dane | wynik), na telefonie jedna kolumna; akcent = pomarańcz tablicy ADR, kolory produktów rozróżniają komory */
 :root{
   --bg:#eef0ef; --surface:#ffffff; --ink:#1b1f22; --muted:#5b646b; --line:#d3d8d7;
-  --accent:#e2700a; --accent-ink:#1b1f22; --liquid:#3d7193; --liquid-soft:#d6e4ee;
-  --ok:#2c7a4b; --warn:#a96a12; --bad:#b3261e; --tank:#c9cfd1;
+  --accent:#e2700a; --accent-ink:#1b1f22;
+  --p1:#3d7193; --p2:#3e8a63; --p3:#b0742a; --p4:#7b5aa6;
+  --ok:#2c7a4b; --warn:#a96a12; --bad:#b3261e; --tank:#c9cfd1; --shadow:rgba(20,30,40,.16);
   --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
   --f-body:"Barlow","Segoe UI",Roboto,Arial,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#131619; --surface:#1b2024; --ink:#e6e9eb; --muted:#97a1a8; --line:#2d3439;
-  --accent:#f08a2c; --accent-ink:#1b1f22; --liquid:#5f9ec4; --liquid-soft:#1f3442;
-  --ok:#5cbf83; --warn:#e0a544; --bad:#ef6b62; --tank:#394146; color-scheme:dark}}
+  --accent:#f08a2c; --accent-ink:#1b1f22;
+  --p1:#5f9ec4; --p2:#5fb487; --p3:#d79a4e; --p4:#a184cc;
+  --ok:#5cbf83; --warn:#e0a544; --bad:#ef6b62; --tank:#394146; --shadow:rgba(0,0,0,.5); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#131619; --surface:#1b2024; --ink:#e6e9eb; --muted:#97a1a8; --line:#2d3439;
-  --accent:#f08a2c; --accent-ink:#1b1f22; --liquid:#5f9ec4; --liquid-soft:#1f3442;
-  --ok:#5cbf83; --warn:#e0a544; --bad:#ef6b62; --tank:#394146; color-scheme:dark}
+  --accent:#f08a2c; --accent-ink:#1b1f22;
+  --p1:#5f9ec4; --p2:#5fb487; --p3:#d79a4e; --p4:#a184cc;
+  --ok:#5cbf83; --warn:#e0a544; --bad:#ef6b62; --tank:#394146; --shadow:rgba(0,0,0,.5); color-scheme:dark}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45}
-.wrap{max-width:1180px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto;padding-block:20px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
 h1{font-family:var(--f-display);font-weight:700;font-size:2rem;line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
 .sub{color:var(--muted);margin:6px 0 0;max-width:60ch}
-.grid{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:18px;align-items:start}
-@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
-section{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.ver{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.hdr-r{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.chip{font-size:.8rem;font-weight:600;padding:4px 10px;border-radius:12px;border:1px solid var(--warn);color:var(--warn);background:transparent;cursor:pointer}
+.grid{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:880px){.grid{grid-template-columns:minmax(0,1fr)}}
+section,details.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+details.panel{display:block}
+details.panel > summary{cursor:pointer;list-style:none;font-family:var(--f-display);font-weight:600;font-size:1.25rem;text-transform:uppercase;letter-spacing:.02em;display:flex;align-items:baseline;gap:8px}
+details.panel > summary::-webkit-details-marker{display:none}
+details.panel > summary::after{content:"+";margin-left:auto;color:var(--muted);font-family:var(--f-mono)}
+details.panel[open] > summary::after{content:"–"}
+details.panel > summary small{font-family:var(--f-body);text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted);font-size:.85rem}
+.pbody{display:flex;flex-direction:column;gap:12px;margin-top:12px}
 .col{display:flex;flex-direction:column;gap:18px;min-width:0}
 h2{font-family:var(--f-display);font-weight:600;font-size:1.25rem;margin:0;letter-spacing:.02em;text-transform:uppercase;display:flex;align-items:baseline;gap:8px}
 h2 small{font-family:var(--f-body);text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted);font-size:.85rem}
+h3{font-family:var(--f-display);font-weight:600;font-size:1.05rem;margin:0;letter-spacing:.03em;text-transform:uppercase}
 label{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;display:block;margin-bottom:4px}
-input,select,button{font:inherit;color:inherit}
-input[type=number],input[type=text],select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:4px;background:var(--bg);font-family:var(--f-mono);font-size:.95rem}
+input,select,button,textarea{font:inherit;color:inherit}
+input[type=number],input[type=text],input[type=search],select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:4px;background:var(--bg);font-family:var(--f-mono);font-size:.95rem}
+input[type=search]{font-family:var(--f-body);font-size:1rem;-webkit-appearance:none;appearance:none}
 select{font-family:var(--f-body)}
-input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-@media (max-width:420px){.row3{grid-template-columns:1fr 1fr}}
+textarea{min-height:90px;font-size:.8rem;resize:vertical}
+input:focus-visible,select:focus-visible,button:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end}
+.row > *{min-width:0}
 .hint{font-size:.82rem;color:var(--muted);margin:0}
-.check{display:flex;gap:8px;align-items:flex-start;font-size:.88rem}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:.88rem;text-transform:none;letter-spacing:0;font-weight:400;color:var(--ink)}
 .check input{margin-top:3px}
 button{cursor:pointer;border-radius:4px;border:1px solid var(--line);background:var(--bg);padding:8px 12px;font-weight:600}
 button:hover{border-color:var(--muted)}
+button:disabled{opacity:.45;cursor:default}
 .btn-accent{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn-accent:hover{filter:brightness(1.05);border-color:var(--accent)}
-.prod-top{display:flex;gap:12px;align-items:flex-start}
-.prod-top > div{flex:1;min-width:0}
-/* Tablica ADR */
-.plate{flex:none;width:74px;border:3px solid #111;border-radius:3px;background:#f28c00;color:#111;font-family:var(--f-mono);font-weight:500;text-align:center}
-.plate div{padding:3px 0;font-size:1rem;line-height:1.2;min-height:1.6em}
+.btn-danger{border-color:var(--bad);color:var(--bad)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.prod-top{display:flex;gap:12px;align-items:flex-end}
+.prod-top > div:first-child{flex:1;min-width:0}
+.plate{flex:none;width:66px;border:3px solid #111;border-radius:3px;background:#f28c00;color:#111;font-family:var(--f-mono);font-weight:500;text-align:center}
+.plate div{padding:2px 0;font-size:.95rem;line-height:1.2;min-height:1.5em}
 .plate div+div{border-top:3px solid #111}
-.plate.none{opacity:.35}
-.ask{display:flex;gap:8px}
-.ask input{flex:1}
-.note{font-size:.82rem;padding:8px 10px;border-radius:4px;background:var(--bg);border:1px dashed var(--line);margin:0}
+.plate.none{opacity:.3}
+.note{font-size:.84rem;padding:8px 10px;border-radius:4px;background:var(--bg);border:1px dashed var(--line);margin:0}
+.note.warn{border-color:var(--warn)}
+/* Combobox */
+.combo{position:relative}
+.combo-list{position:absolute;left:0;right:0;top:100%;z-index:30;background:var(--surface);border:1px solid var(--line);border-radius:6px;box-shadow:0 10px 28px var(--shadow);max-height:min(60vh,380px);overflow:auto;margin:4px 0 0;padding:4px;list-style:none}
+.opt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1px 10px;padding:8px 10px;border-radius:4px;cursor:pointer}
+.opt[aria-selected=true],.opt:hover{background:var(--bg)}
+.opt .on{font-weight:600;overflow-wrap:anywhere}
+.opt .meta{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);text-align:right;white-space:nowrap}
+.opt .sub{grid-column:1/-1;font-size:.8rem;color:var(--muted)}
+.opt.act .on{color:var(--accent)}
+.opt-head{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:8px 10px 2px;font-weight:600}
+.tag{display:inline-block;font-size:.68rem;font-weight:600;padding:0 6px;border-radius:8px;border:1px solid var(--line);margin-left:6px;vertical-align:1px;color:var(--muted)}
+.tag.my{border-color:var(--accent);color:var(--accent)}
 /* Komory */
 .comps{display:flex;flex-direction:column;gap:8px}
-.comp{display:grid;grid-template-columns:30px minmax(0,1fr) auto 34px;gap:8px;align-items:center}
+.comp,.comp-head{display:grid;grid-template-columns:30px minmax(0,1fr) auto 34px;gap:8px;align-items:center}
 .comp .n{font-family:var(--f-display);font-size:1.3rem;font-weight:700;text-align:center;color:var(--muted)}
+.comp-head{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
 .seg{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
 .seg button{border:0;border-radius:0;padding:8px 10px;background:var(--bg);font-weight:500;font-size:.85rem}
 .seg button[aria-pressed=true]{background:var(--ink);color:var(--surface)}
-.del{padding:8px 0;color:var(--muted)}
-.comp-head{display:grid;grid-template-columns:30px minmax(0,1fr) auto 34px;gap:8px;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.seg.wide button{flex:1}
+.del{padding:8px 0;color:var(--muted);width:34px}
+/* Ładunki */
+.loads{display:flex;flex-direction:column;gap:12px}
+.load{border:1px solid var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.load-h{display:flex;align-items:center;gap:8px}
+.load-h b{font-family:var(--f-display);font-size:1.1rem;letter-spacing:.03em;text-transform:uppercase;flex:1}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;flex:none;vertical-align:-1px}
+.load details summary{cursor:pointer;font-size:.85rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px}
+.load details[open] summary{margin-bottom:10px}
+.dsum{font-family:var(--f-mono);font-size:.78rem}
+.det{display:flex;flex-direction:column;gap:10px}
 .slider{display:flex;flex-direction:column;gap:4px}
 .slider input{width:100%;accent-color:var(--accent)}
 .slider .ends{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted)}
 /* Wynik */
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 @media (max-width:560px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.stat{border-left:3px solid var(--line);padding:2px 0 2px 10px}
-.stat b{display:block;font-family:var(--f-mono);font-weight:500;font-size:1.15rem;font-variant-numeric:tabular-nums}
-.stat span{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.stat{border-left:3px solid var(--line);padding:2px 0 2px 10px;min-width:0}
+.stat b{display:block;font-family:var(--f-mono);font-weight:500;font-size:1.1rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.stat.bad{border-left-color:var(--bad)} .stat.bad b{color:var(--bad)}
+.stat.ok{border-left-color:var(--ok)}
+.psum{display:flex;flex-direction:column;gap:4px}
+.psum div{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:12px;font-size:.85rem;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--line)}
+.psum div:last-child{border-bottom:0}
+.psum .nm{overflow-wrap:anywhere}
+.psum .v{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.psum .h{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+@media (max-width:480px){.psum div{grid-template-columns:minmax(0,1fr) auto auto}.psum .c15{display:none}}
 .tankbox{overflow-x:auto}
 .tank{display:flex;gap:4px;padding:10px;background:var(--tank);border-radius:40px 14px 14px 40px;min-width:420px;position:relative}
-.cell{position:relative;height:120px;background:var(--surface);border-radius:4px;overflow:hidden;min-width:0}
-.cell .fill{position:absolute;left:0;right:0;bottom:0;background:var(--liquid);transition:height .35s ease}
+.cell{position:relative;height:124px;background:var(--surface);border-radius:4px;overflow:hidden;min-width:0}
+.cell .fill{position:absolute;left:0;right:0;bottom:0;transition:height .35s ease}
+.cell .fill.over{background:var(--bad)!important}
 .cell .lim{position:absolute;left:0;right:0;border-top:1px dashed var(--muted);opacity:.7}
 .cell .baf{position:absolute;top:8px;bottom:8px;left:50%;border-left:2px dotted var(--muted);opacity:.6}
-.cell .lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:.82rem;text-align:center;line-height:1.2;color:var(--ink);text-shadow:0 0 3px var(--surface)}
+.cell .lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:.8rem;text-align:center;line-height:1.25;color:var(--ink);text-shadow:0 0 3px var(--surface),0 0 3px var(--surface)}
 .cell .lbl strong{font-family:var(--f-display);font-size:1.25rem}
 .cog{position:absolute;bottom:-2px;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:10px solid var(--accent);transform:translateX(-8px)}
 .cog.t{border-bottom-color:transparent;border-top:10px solid var(--muted);bottom:auto;top:-2px}
 .dir{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:6px;min-width:420px}
-.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
 .legend i{display:inline-block;width:10px;height:10px;margin-right:5px;vertical-align:-1px}
 .tablebox{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;min-width:520px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;min-width:600px}
 th,td{padding:8px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
 th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
 td{font-family:var(--f-mono);font-size:.9rem}
-th:first-child,td:first-child{text-align:left}
-td.st{font-family:var(--f-body);text-align:left}
+th:first-child,td:first-child,th.l,td.l{text-align:left}
+td.st,td.pr{font-family:var(--f-body);text-align:left}
+td.pr{white-space:normal;min-width:120px}
 tfoot td{font-weight:500;border-bottom:0}
+td select{width:auto;max-width:170px;padding:5px 6px;font-size:.85rem}
+input.kg{width:100px;padding:6px 8px;text-align:right;border-color:var(--accent)}
 .pill{display:inline-block;font-family:var(--f-body);font-size:.75rem;font-weight:600;padding:2px 8px;border-radius:10px;border:1px solid currentColor}
 .p-ok{color:var(--ok)}.p-warn{color:var(--warn)}.p-mut{color:var(--muted)}.p-bad{color:var(--bad)}
 .variants{display:flex;gap:8px;flex-wrap:wrap}
@@ -115,12 +166,24 @@ tfoot td{font-weight:500;border-bottom:0}
 .msgs{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
 .msgs li{font-size:.88rem;padding:8px 10px;border-radius:4px;border-left:3px solid var(--warn);background:var(--bg)}
 .msgs li.bad{border-left-color:var(--bad)}
-.msgs li.info{border-left-color:var(--liquid)}
-.foot{font-size:.8rem;color:var(--muted);max-width:75ch}
+.msgs li.info{border-left-color:var(--p1)}
+.foot{font-size:.8rem;color:var(--muted);max-width:75ch;margin:0}
 .mono{font-family:var(--f-mono)}
-.seg.wide button{flex:1}
-input.kg{width:96px;padding:6px 8px;text-align:right;border-color:var(--accent)}
-.cell .fill.over{background:var(--bad)}
+/* Moje produkty / kopia */
+.mylist{display:flex;flex-direction:column}
+.myrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.myrow:last-child{border-bottom:0}
+.myrow .nm{overflow-wrap:anywhere}
+.myrow .meta{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.myrow button{padding:6px 10px;font-size:.85rem}
+.form{border:1px solid var(--accent);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.err{color:var(--bad);font-size:.85rem;margin:0}
+.status{font-size:.85rem;display:flex;flex-direction:column;gap:4px;margin:0;padding:0;list-style:none}
+.status b{font-weight:600}
+.whatsnew{border:1px solid var(--accent);border-radius:6px;padding:12px 14px;background:var(--surface);display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.whatsnew ul{margin:0;padding-left:18px;font-size:.9rem}
+.updbar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--ink);color:var(--surface);display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:.92rem}
+.updbar button{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 @media (prefers-reduced-motion:reduce){.cell .fill{transition:none}}
 </style>
 </head>
@@ -132,65 +195,56 @@ input.kg{width:96px;padding:6px 8px;text-align:right;border-color:var(--accent)}
     <h1>Kalkulator komór cysterny</h1>
     <p class="sub">Podział ładunku na komory zgodnie z ADR 4.3.2.2 (stopień napełnienia) i 4.3.2.3.6 (zasada 20/80 dla komór bez falochronów).</p>
   </div>
+  <div class="hdr-r">
+    <span class="ver" id="ver"></span>
+    <button type="button" class="chip" id="backupChip" hidden>Zmiany bez kopii zapasowej</button>
+  </div>
 </header>
+
+<div class="whatsnew" id="whatsnew" hidden>
+  <h3 id="wnTitle"></h3>
+  <ul id="wnList"></ul>
+  <div><button type="button" id="wnOk">OK</button></div>
+</div>
 
 <div class="grid">
 <div class="col">
-  <section aria-labelledby="h-prod">
-    <h2 id="h-prod">1. Produkt</h2>
-    <div class="prod-top">
-      <div>
-        <label for="prod">Produkt</label>
-        <select id="prod"></select>
-      </div>
-      <div class="plate" id="plate" aria-label="Tablica ADR"><div id="pl-k"></div><div id="pl-un"></div></div>
-    </div>
-    <div class="ask" id="askBox" hidden>
-      <input type="text" id="askName" placeholder="Nazwa lub numer UN, np. octan etylu">
-      <button type="button" id="askBtn">Zapytaj Claude</button>
-    </div>
-    <p class="note" id="askNote" hidden></p>
-    <div class="row">
-      <div><label for="d15">Gęstość w 15 °C (kg/l)</label><input type="number" id="d15" step="0.001" min="0.3" max="3"></div>
-      <div><label for="alpha">Wsp. rozszerzalności α (1/°C)</label><input type="number" id="alpha" step="0.00001" min="0" max="0.003"></div>
+  <section aria-labelledby="h-tr">
+    <h2 id="h-tr">1. Naczepa</h2>
+    <div class="combo" id="trCombo">
+      <label for="trSearch">Wybierz naczepę (nr boczny lub rejestracja)</label>
+      <input type="search" id="trSearch" autocomplete="off" placeholder="np. 4127 lub OR-123">
     </div>
     <div class="row">
-      <div><label for="temp">Temp. produktu (°C)</label><input type="number" id="temp" step="1" min="-30" max="80"></div>
-      <div><label for="lim">Limit terminalu/firmy (%)</label><input type="number" id="lim" step="0.5" min="50" max="100" placeholder="brak"></div>
+      <div><label for="trFleet">Nr boczny</label><input type="text" id="trFleet" placeholder="np. 4127"></div>
+      <div><label for="trReg">Nr rejestracyjny</label><input type="text" id="trReg" placeholder="np. OR-123-B"></div>
     </div>
-    <div>
-      <label for="kform">Wzór na maks. napełnienie (ADR 4.3.2.2.1)</label>
-      <select id="kform">
-        <option value="100">100/(1+α(50−t)) · zapalne, bez zagrożeń dodatkowych</option>
-        <option value="98">98/(1+α(50−t)) · toksyczne lub żrące</option>
-        <option value="97">97/(1+α(50−t)) · zapalne lekko toks./żrące, zbiornik hermetyczny</option>
-        <option value="95">95/(1+α(50−t)) · toksyczne/żrące, zbiornik hermetyczny</option>
-      </select>
-    </div>
-    <label class="check" for="visc" style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--ink)"><input type="checkbox" id="visc"> Produkt lepki (≥ 2680 mm²/s w 20 °C), zasada 20/80 nie obowiązuje</label>
-    <p class="hint">Wartości z listy są typowe i przybliżone. Do obliczeń wpisz gęstość z dokumentu załadunkowego terminalu.</p>
-  </section>
-
-  <section aria-labelledby="h-comp">
-    <h2 id="h-comp">2. Komory <small>od przodu do tyłu</small></h2>
-    <div class="comp-head"><span>Nr</span><span>Pojemność (l)</span><span>Falochrony</span><span></span></div>
+    <div><label for="payload">Dopuszczalna ładowność (kg)</label><input type="number" id="payload" step="10" min="0" placeholder="opcjonalnie"></div>
+    <div class="comp-head"><span>Nr</span><span>Pojemność (l), od przodu</span><span>Falochrony</span><span></span></div>
     <div class="comps" id="comps"></div>
     <button type="button" id="addComp">+ Dodaj komorę</button>
+    <div class="toolbar">
+      <button type="button" id="trNew">+ Nowa naczepa</button>
+      <button type="button" id="trCopy">Kopiuj naczepę</button>
+      <button type="button" id="trDel" class="btn-danger">Usuń naczepę</button>
+    </div>
     <p class="hint">Komora bez falochronów o pojemności powyżej 7500 l może być napełniona tylko do 20% lub od 80%.</p>
   </section>
 
   <section aria-labelledby="h-load">
-    <h2 id="h-load">3. Załadunek</h2>
-    <div class="row">
-      <div><label for="mass">Masa do załadunku (kg)</label><input type="number" id="mass" step="10" min="0"></div>
-      <div><label for="payload">Dopuszczalna ładowność (kg)</label><input type="number" id="payload" step="10" min="0" placeholder="opcjonalnie"></div>
-    </div>
+    <h2 id="h-load">2. Produkty <small>do 4, każdy w osobnych komorach</small></h2>
+    <div class="loads" id="loads"></div>
+    <button type="button" id="addLoad">+ Dodaj produkt</button>
+  </section>
+
+  <section aria-labelledby="h-dist">
+    <h2 id="h-dist">3. Rozmieszczenie</h2>
     <div>
       <label id="strat-l">Sposób rozłożenia</label>
       <div class="seg wide" id="strat" role="group" aria-labelledby="strat-l">
         <button type="button" data-v="even">Równomiernie</button><button type="button" data-v="min">Najmniej częściowych komór</button>
       </div>
-      <p class="hint" style="margin-top:6px">Równomiernie: podobny stopień napełnienia we wszystkich komorach, w ramach przepisów. Drugi tryb ogranicza liczbę częściowo napełnionych komór.</p>
+      <p class="hint" style="margin-top:6px">Równomiernie: podobny stopień napełnienia komór w ramach przepisów. Drugi tryb ogranicza liczbę częściowo napełnionych komór.</p>
     </div>
     <div class="slider">
       <label for="target">Docelowy środek ciężkości ładunku: <span id="targetVal" class="mono"></span></label>
@@ -198,275 +252,725 @@ input.kg{width:96px;padding:6px 8px;text-align:right;border-color:var(--accent)}
       <div class="ends"><span>Przód (siodło)</span><span>Środek</span><span>Tył (osie naczepy)</span></div>
     </div>
   </section>
+
+  <details class="panel" id="myPanel">
+    <summary>Moje produkty <small id="myCount"></small></summary>
+    <div class="pbody">
+      <p class="hint">Produkty, które wozisz, z gęstością z dokumentów terminalu. W wyszukiwarce są pokazywane jako pierwsze.</p>
+      <div class="mylist" id="myList"></div>
+      <div class="form" id="myForm" hidden></div>
+      <div><button type="button" id="myAdd">+ Dodaj mój produkt</button></div>
+    </div>
+  </details>
+
+  <details class="panel" id="bkPanel">
+    <summary>Kopia zapasowa <small id="bkSum"></small></summary>
+    <div class="pbody">
+      <ul class="status" id="bkStatus"></ul>
+      <div class="toolbar">
+        <button type="button" class="btn-accent" id="bkShare">Udostępnij kopię (plik)</button>
+        <button type="button" id="bkCopy">Kopiuj jako tekst</button>
+      </div>
+      <p class="note" id="bkMsg" hidden></p>
+      <textarea id="bkText" hidden readonly aria-label="Kopia zapasowa jako tekst"></textarea>
+      <h3>Przywróć</h3>
+      <div><label for="bkFile">Wczytaj plik kopii</label><input type="file" id="bkFile" accept=".json,.txt,application/json,text/plain"></div>
+      <textarea id="bkPaste" placeholder="…albo wklej tutaj tekst kopii (zaczyna się od KOMORY:)" aria-label="Wklej tekst kopii"></textarea>
+      <div class="toolbar"><button type="button" id="bkPasteBtn">Wczytaj wklejony tekst</button></div>
+      <div class="form" id="bkConfirm" hidden></div>
+      <p class="hint">Kopia zawiera naczepy i Twoje produkty. Zapisz ją np. na Google Drive, w e-mailu do siebie albo w notatkach.</p>
+    </div>
+  </details>
 </div>
 
 <div class="col">
-  <section aria-labelledby="h-res" aria-live="polite">
-    <h2 id="h-res">Plan załadunku</h2>
+  <section aria-labelledby="h-res">
+    <h2 id="h-res">Plan załadunku <small id="resTrailer"></small></h2>
     <div class="stats" id="stats"></div>
+    <div class="psum" id="psum"></div>
     <div class="variants" id="variants"></div>
     <div class="tankbox">
       <div class="tank" id="tank"></div>
       <div class="dir"><span>◀ Przód</span><span>Tył ▶</span></div>
     </div>
     <div class="legend">
-      <span><i style="background:var(--liquid)"></i>Produkt</span>
       <span><i style="border-top:2px dashed var(--muted);height:0;width:14px"></i>Maks. napełnienie</span>
       <span><i style="border-left:2px dotted var(--muted);width:2px"></i>Falochrony</span>
-      <span><i style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:9px solid var(--accent);background:none"></i>Środek ciężkości</span>
-      <span><i style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:9px solid var(--muted);background:none"></i>Cel</span>
+      <span><i style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:9px solid var(--accent)"></i>Środek ciężkości</span>
+      <span><i style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:9px solid var(--muted)"></i>Cel</span>
     </div>
     <div class="tablebox"><table id="tbl"></table></div>
-    <ul class="msgs" id="msgs"></ul>
+    <ul class="msgs" id="msgs" aria-live="polite"></ul>
   </section>
-  <p class="foot">Kalkulator nie zna nacisków na osie Twojego zestawu. Środek ciężkości liczony jest wzdłuż zbiornika przy założeniu stałego przekroju komór. Przed odjazdem sprawdź naciski na wadze lub systemie ważenia pokładowego i stosuj się do instrukcji terminalu.</p>
+  <p class="foot">Gęstości w bazie są typowe. Do obliczeń wpisz gęstość z dokumentu załadunkowego terminalu. Kalkulator nie zna nacisków na osie Twojego zestawu: środek ciężkości liczony jest wzdłuż zbiornika, przy założeniu stałego przekroju komór. Przed odjazdem sprawdź naciski i stosuj się do instrukcji terminalu.</p>
 </div>
 </div>
 </div>
+
+<div class="updbar" id="updbar" hidden><span>Dostępna nowa wersja aplikacji.</span><button type="button" id="updBtn">Odśwież</button></div>
 
 <script>
-const PRODUCTS=[
- {g:"ADR · klasa 3",id:"diesel",n:"Olej napędowy (ON)",d:0.835,a:0.00084,k:100,un:"1202",ke:"30"},
- {g:"ADR · klasa 3",id:"petrol",n:"Benzyna (E5/E10)",d:0.745,a:0.00120,k:100,un:"1203",ke:"33"},
- {g:"ADR · klasa 3",id:"ethanol",n:"Etanol",d:0.794,a:0.00110,k:100,un:"1170",ke:"33"},
- {g:"ADR · klasa 3",id:"methanol",n:"Metanol",d:0.796,a:0.00120,k:98,un:"1230",ke:"336"},
- {g:"ADR · klasa 3",id:"acetone",n:"Aceton",d:0.797,a:0.00143,k:100,un:"1090",ke:"33"},
- {g:"ADR · klasa 3",id:"toluene",n:"Toluen",d:0.871,a:0.00108,k:100,un:"1294",ke:"33"},
- {g:"ADR · klasa 3",id:"xylene",n:"Ksylen",d:0.868,a:0.00099,k:100,un:"1307",ke:"30"},
- {g:"ADR · klasa 3",id:"ipa",n:"Izopropanol",d:0.789,a:0.00107,k:100,un:"1219",ke:"33"},
- {g:"ADR · klasa 8",id:"h2so4",n:"Kwas siarkowy 96%",d:1.840,a:0.00057,k:98,un:"1830",ke:"80"},
- {g:"ADR · klasa 8",id:"naoh",n:"Ług sodowy (NaOH 50%)",d:1.530,a:0.00045,k:98,un:"1824",ke:"80"},
- {g:"ADR · klasa 8",id:"hcl",n:"Kwas solny 32%",d:1.160,a:0.00045,k:98,un:"1789",ke:"80"},
- {g:"ADR · klasa 8",id:"h3po4",n:"Kwas fosforowy 75%",d:1.580,a:0.00040,k:98,un:"1805",ke:"80"},
- {g:"Bez ADR · glikole i chemia",id:"meg",n:"Glikol monoetylenowy (MEG)",d:1.116,a:0.00062,k:100,un:"",ke:"",nadr:1},
- {g:"Bez ADR · glikole i chemia",id:"deg",n:"Glikol dietylenowy (DEG)",d:1.120,a:0.00064,k:100,un:"",ke:"",nadr:1},
- {g:"Bez ADR · glikole i chemia",id:"mpg",n:"Glikol propylenowy (MPG)",d:1.038,a:0.00072,k:100,un:"",ke:"",nadr:1},
- {g:"Bez ADR · glikole i chemia",id:"glycerol",n:"Gliceryna (glicerol 99%)",d:1.264,a:0.00050,k:100,un:"",ke:"",nadr:1},
- {g:"Bez ADR · glikole i chemia",id:"adblue",n:"AdBlue (mocznik 32,5%)",d:1.091,a:0.00045,k:100,un:"",ke:"",nadr:1},
- {g:"Bez ADR · glikole i chemia",id:"rsm",n:"Nawóz RSM 32",d:1.320,a:0.00050,k:100,un:"",ke:"",nadr:1},
- {g:"Bez ADR · oleje",id:"fame",n:"Biodiesel (FAME)",d:0.883,a:0.00083,k:100,un:"",ke:"",nadr:1},
- {g:"Bez ADR · oleje",id:"base",n:"Olej bazowy mineralny (SN150)",d:0.865,a:0.00070,k:100,un:"",ke:"",nadr:1},
- {g:"Bez ADR · oleje",id:"hydr",n:"Olej hydrauliczny / smarowy",d:0.875,a:0.00068,k:100,un:"",ke:"",nadr:1},
- {g:"Bez ADR · tłuszcze roślinne i zwierzęce",id:"rape",n:"Olej rzepakowy",d:0.917,a:0.00072,k:100,un:"",ke:"",nadr:1},
- {g:"Bez ADR · tłuszcze roślinne i zwierzęce",id:"sun",n:"Olej słonecznikowy",d:0.921,a:0.00072,k:100,un:"",ke:"",nadr:1},
- {g:"Bez ADR · tłuszcze roślinne i zwierzęce",id:"soy",n:"Olej sojowy",d:0.922,a:0.00072,k:100,un:"",ke:"",nadr:1},
- {g:"Bez ADR · tłuszcze roślinne i zwierzęce",id:"palm",n:"Olej palmowy (podgrzewany)",d:0.914,a:0.00073,k:100,un:"",ke:"",nadr:1,t:55,lim:98},
- {g:"Bez ADR · tłuszcze roślinne i zwierzęce",id:"tallow",n:"Tłuszcz zwierzęcy / łój (podgrzewany)",d:0.915,a:0.00075,k:100,un:"",ke:"",nadr:1,t:60,lim:98},
- {g:"Bez ADR · tłuszcze roślinne i zwierzęce",id:"uco",n:"Olej posmażalniczy (UCO)",d:0.920,a:0.00072,k:100,un:"",ke:"",nadr:1},
- {g:"Bez ADR · tłuszcze roślinne i zwierzęce",id:"molasses",n:"Melasa",d:1.400,a:0.00040,k:100,un:"",ke:"",nadr:1,visc:1},
- {g:"Inne",id:"custom",n:"Inny / własne dane",d:1.000,a:0.00060,k:100,un:"",ke:""}
+"use strict";
+const APP_VERSION="2.0", APP_DATE="31.10.2026", SCHEMA=3, KEY="cysterna-v3";
+const WHATSNEW=["Kilka produktów w jednej cysternie, każdy w osobnych komorach","Zapisane naczepy z numerem bocznym i rejestracyjnym","Wyszukiwarka produktów po nazwie (PL/NL/EN) lub numerze UN, baza ok. 100 produktów","„Moje produkty” z gęstością z dokumentów","Kopia zapasowa do pliku lub jako tekst","Twoje dotychczasowe ustawienia zostały przeniesione"];
+
+// ---- Baza produktów: d = gęstość w 15 °C (kg/l, typowa), a = α (1/°C), k = wzór ADR 4.3.2.2.1, al = nazwy zastępcze (PL/NL/EN), gen = pozycja ogólna
+const DB=[
+ {id:"diesel",n:"Olej napędowy (ON)",un:"1202",ke:"30",c:"3",d:0.835,a:0.00084,k:100,al:"diesel gasolie gasoil gas oil B7 EN590 ON"},
+ {id:"hvo",n:"Olej napędowy HVO100",un:"1202",ke:"30",c:"3",d:0.780,a:0.00090,k:100,al:"HVO hydrotreated vegetable oil renewable diesel"},
+ {id:"heating",n:"Olej opałowy lekki",un:"1202",ke:"30",c:"3",d:0.845,a:0.00080,k:100,al:"huisbrandolie heating oil stookolie licht"},
+ {id:"petrol",n:"Benzyna (E5/E10)",un:"1203",ke:"33",c:"3",d:0.745,a:0.00120,k:100,al:"benzine petrol gasoline euro 95 98 E10 E5 motor spirit"},
+ {id:"e85",n:"Paliwo E85 (etanol + benzyna)",un:"3475",ke:"33",c:"3",d:0.785,a:0.00115,k:100,al:"E85 ethanol gasoline mixture bio-ethanol"},
+ {id:"kerosene",n:"Nafta / kerozyna",un:"1223",ke:"30",c:"3",d:0.800,a:0.00095,k:100,al:"kerosine kerosene petroleum lampolie"},
+ {id:"jet",n:"Paliwo lotnicze Jet A-1",un:"1863",ke:"30",c:"3",d:0.800,a:0.00095,k:100,al:"jet fuel kerosine vliegtuigbrandstof aviation turbine fuel JET A1"},
+ {id:"crude",n:"Ropa naftowa",un:"1267",ke:"33",c:"3",d:0.850,a:0.00090,k:100,al:"ruwe olie crude oil petroleum crude"},
+ {id:"whitespirit",n:"Benzyna lakowa / white spirit",un:"1300",ke:"30",c:"3",d:0.780,a:0.00095,k:100,al:"white spirit terpentine substituut turpentine substitute mineral spirits"},
+ {id:"ethanol",n:"Etanol",un:"1170",ke:"33",c:"3",d:0.794,a:0.00110,k:100,al:"ethanol ethylalcohol ethyl alcohol spirytus alkohol bioethanol"},
+ {id:"methanol",n:"Metanol",un:"1230",ke:"336",c:"3 (6.1)",d:0.796,a:0.00120,k:98,al:"methanol methylalcohol methyl alcohol"},
+ {id:"ipa",n:"Izopropanol (IPA)",un:"1219",ke:"33",c:"3",d:0.789,a:0.00107,k:100,al:"isopropanol isopropyl alcohol propan-2-ol IPA 2-propanol"},
+ {id:"npa",n:"n-Propanol",un:"1274",ke:"33",c:"3",d:0.807,a:0.00098,k:100,al:"n-propanol propanol propan-1-ol"},
+ {id:"nbutanol",n:"n-Butanol",un:"1120",ke:"30",c:"3",d:0.813,a:0.00094,k:100,al:"butanol n-butylalcohol butan-1-ol"},
+ {id:"isobutanol",n:"Izobutanol",un:"1212",ke:"30",c:"3",d:0.805,a:0.00095,k:100,al:"isobutanol isobutyl alcohol"},
+ {id:"acetone",n:"Aceton",un:"1090",ke:"33",c:"3",d:0.796,a:0.00143,k:100,al:"aceton acetone propanone"},
+ {id:"mek",n:"Metyloetyloketon (MEK)",un:"1193",ke:"33",c:"3",d:0.810,a:0.00130,k:100,al:"methylethylketon methyl ethyl ketone butanone MEK"},
+ {id:"etac",n:"Octan etylu",un:"1173",ke:"33",c:"3",d:0.906,a:0.00138,k:100,al:"ethylacetaat ethyl acetate"},
+ {id:"buac",n:"Octan butylu",un:"1123",ke:"33",c:"3",d:0.886,a:0.00122,k:100,al:"butylacetaat butyl acetate n-butyl acetate"},
+ {id:"toluene",n:"Toluen",un:"1294",ke:"33",c:"3",d:0.872,a:0.00108,k:100,al:"tolueen toluene toluol"},
+ {id:"xylene",n:"Ksylen",un:"1307",ke:"30",c:"3",d:0.868,a:0.00099,k:100,al:"xyleen xylene xylol"},
+ {id:"benzene",n:"Benzen",un:"1114",ke:"33",c:"3",d:0.884,a:0.00124,k:100,al:"benzeen benzene benzol"},
+ {id:"styrene",n:"Styren (stabilizowany)",un:"2055",ke:"39",c:"3",d:0.909,a:0.00098,k:100,al:"styreen styrene monomer"},
+ {id:"cyclohexane",n:"Cykloheksan",un:"1145",ke:"33",c:"3",d:0.783,a:0.00120,k:100,al:"cyclohexaan cyclohexane"},
+ {id:"hexane",n:"Heksan",un:"1208",ke:"33",c:"3",d:0.664,a:0.00135,k:100,al:"hexaan hexane n-hexane"},
+ {id:"heptane",n:"Heptan",un:"1206",ke:"33",c:"3",d:0.688,a:0.00124,k:100,al:"heptaan heptane n-heptane"},
+ {id:"mtbe",n:"MTBE",un:"2398",ke:"33",c:"3",d:0.745,a:0.00140,k:100,al:"methyl tert-butyl ether methyl-tert-butylether"},
+ {id:"acn",n:"Acetonitryl",un:"1648",ke:"33",c:"3",d:0.786,a:0.00137,k:100,al:"acetonitril acetonitrile"},
+ {id:"thf",n:"Tetrahydrofuran (THF)",un:"2056",ke:"33",c:"3",d:0.889,a:0.00125,k:100,al:"tetrahydrofuraan tetrahydrofuran THF"},
+ {id:"acrylonitrile",n:"Akrylonitryl (stabilizowany)",un:"1093",ke:"336",c:"3 (6.1)",d:0.811,a:0.00113,k:98,al:"acrylonitril acrylonitrile ACN"},
+ {id:"vam",n:"Octan winylu (stabilizowany)",un:"1301",ke:"339",c:"3",d:0.937,a:0.00137,k:100,al:"vinylacetaat vinyl acetate VAM"},
+ {id:"buacr",n:"Akrylan butylu (stabilizowany)",un:"2348",ke:"39",c:"3",d:0.898,a:0.00105,k:100,al:"butylacrylaat butyl acrylate BA"},
+ {id:"meacr",n:"Akrylan metylu (stabilizowany)",un:"1919",ke:"339",c:"3",d:0.956,a:0.00125,k:100,al:"methylacrylaat methyl acrylate MA"},
+ {id:"mma",n:"Metakrylan metylu (MMA)",un:"1247",ke:"339",c:"3",d:0.944,a:0.00121,k:100,al:"methylmethacrylaat methyl methacrylate MMA"},
+ {id:"g1993a",n:"Materiał zapalny ciekły, i.n.o. (gr. II)",un:"1993",ke:"33",c:"3",d:0.850,a:0.00100,k:100,gen:1,al:"brandbare vloeistof flammable liquid n.o.s. NOS"},
+ {id:"g1993b",n:"Materiał zapalny ciekły, i.n.o. (gr. III)",un:"1993",ke:"30",c:"3",d:0.850,a:0.00100,k:100,gen:1,al:"brandbare vloeistof flammable liquid n.o.s. NOS"},
+ {id:"g1866",n:"Żywica w roztworze, zapalna",un:"1866",ke:"30",c:"3",d:1.000,a:0.00090,k:100,gen:1,al:"hars oplossing resin solution"},
+ {id:"g1263",n:"Farba / materiał pokrewny (zapalny)",un:"1263",ke:"30",c:"3",d:1.000,a:0.00090,k:100,gen:1,al:"verf paint paint related material lak"},
+ {id:"h2so4",n:"Kwas siarkowy 96%",un:"1830",ke:"80",c:"8",d:1.840,a:0.00057,k:98,al:"zwavelzuur sulphuric acid sulfuric acid"},
+ {id:"h2so4b",n:"Kwas siarkowy 38% (akumulatorowy)",un:"2796",ke:"80",c:"8",d:1.285,a:0.00050,k:98,al:"accuzuur battery fluid acid zwavelzuur sulphuric acid"},
+ {id:"hcl",n:"Kwas solny 32%",un:"1789",ke:"80",c:"8",d:1.160,a:0.00045,k:98,al:"zoutzuur hydrochloric acid HCl"},
+ {id:"hno3",n:"Kwas azotowy 53–60%",un:"2031",ke:"80",c:"8",d:1.330,a:0.00060,k:98,al:"salpeterzuur nitric acid"},
+ {id:"h3po4",n:"Kwas fosforowy 75%",un:"1805",ke:"80",c:"8",d:1.580,a:0.00040,k:98,al:"fosforzuur phosphoric acid"},
+ {id:"acetic",n:"Kwas octowy lodowaty (>80%)",un:"2789",ke:"83",c:"8 (3)",d:1.055,a:0.00107,k:98,al:"azijnzuur ijsazijn glacial acetic acid"},
+ {id:"acetic80",n:"Kwas octowy 50–80%",un:"2790",ke:"80",c:"8",d:1.070,a:0.00090,k:98,al:"azijnzuur acetic acid solution"},
+ {id:"formic99",n:"Kwas mrówkowy >85%",un:"1779",ke:"83",c:"8 (3)",d:1.220,a:0.00100,k:98,al:"mierenzuur formic acid"},
+ {id:"formic85",n:"Kwas mrówkowy 10–85%",un:"3412",ke:"80",c:"8",d:1.195,a:0.00090,k:98,al:"mierenzuur formic acid"},
+ {id:"propionic",n:"Kwas propionowy (≥90%)",un:"3463",ke:"83",c:"8 (3)",d:0.993,a:0.00110,k:98,al:"propionzuur propionic acid"},
+ {id:"acrylic",n:"Kwas akrylowy (stabilizowany)",un:"2218",ke:"839",c:"8 (3)",d:1.055,a:0.00110,k:98,al:"acrylzuur acrylic acid"},
+ {id:"naoh50",n:"Ług sodowy 50% (NaOH)",un:"1824",ke:"80",c:"8",d:1.530,a:0.00045,k:98,al:"natronloog natriumhydroxide caustic soda sodium hydroxide solution NaOH"},
+ {id:"naoh30",n:"Ług sodowy 25–33% (NaOH)",un:"1824",ke:"80",c:"8",d:1.330,a:0.00045,k:98,al:"natronloog natriumhydroxide caustic soda sodium hydroxide solution NaOH"},
+ {id:"koh",n:"Ług potasowy 50% (KOH)",un:"1814",ke:"80",c:"8",d:1.510,a:0.00045,k:98,al:"kaliloog kaliumhydroxide potassium hydroxide solution KOH caustic potash"},
+ {id:"naocl",n:"Podchloryn sodu ~14%",un:"1791",ke:"80",c:"8",d:1.230,a:0.00050,k:98,al:"natriumhypochloriet bleekloog hypochlorite solution bleach javel"},
+ {id:"nh3aq",n:"Woda amoniakalna 25%",un:"2672",ke:"80",c:"8",d:0.910,a:0.00070,k:98,al:"ammoniak oplossing ammonia solution ammonium hydroxide"},
+ {id:"fecl3",n:"Chlorek żelaza(III) 40%",un:"2582",ke:"80",c:"8",d:1.420,a:0.00045,k:98,al:"ijzerchloride ferric chloride solution ijzer(III)chloride"},
+ {id:"eda",n:"Etylenodiamina",un:"1604",ke:"83",c:"8 (3)",d:0.900,a:0.00105,k:98,al:"ethyleendiamine ethylenediamine EDA"},
+ {id:"mea",n:"Monoetanoloamina (MEA)",un:"2491",ke:"80",c:"8",d:1.018,a:0.00080,k:98,al:"monoethanolamine ethanolamine MEA"},
+ {id:"g1760",n:"Materiał żrący ciekły, i.n.o.",un:"1760",ke:"80",c:"8",d:1.200,a:0.00060,k:98,gen:1,al:"bijtende vloeistof corrosive liquid n.o.s. NOS"},
+ {id:"g3264",n:"Materiał żrący ciekły, kwasowy, nieorg., i.n.o.",un:"3264",ke:"80",c:"8",d:1.200,a:0.00060,k:98,gen:1,al:"bijtende vloeistof zuur corrosive liquid acidic inorganic n.o.s. NOS"},
+ {id:"g3266",n:"Materiał żrący ciekły, zasadowy, nieorg., i.n.o.",un:"3266",ke:"80",c:"8",d:1.200,a:0.00060,k:98,gen:1,al:"bijtende vloeistof basisch corrosive liquid basic inorganic n.o.s. NOS"},
+ {id:"h2o2",n:"Nadtlenek wodoru 50%",un:"2014",ke:"58",c:"5.1 (8)",d:1.195,a:0.00060,k:98,al:"waterstofperoxide hydrogen peroxide H2O2"},
+ {id:"h2o2b",n:"Nadtlenek wodoru 35%",un:"2014",ke:"58",c:"5.1 (8)",d:1.130,a:0.00060,k:98,al:"waterstofperoxide hydrogen peroxide H2O2"},
+ {id:"dcm",n:"Dichlorometan",un:"1593",ke:"60",c:"6.1",d:1.330,a:0.00137,k:98,al:"dichloormethaan methyleenchloride dichloromethane methylene chloride DCM"},
+ {id:"tce",n:"Trichloroetylen",un:"1710",ke:"60",c:"6.1",d:1.470,a:0.00117,k:98,al:"trichloorethyleen trichloroethylene TRI"},
+ {id:"pce",n:"Tetrachloroetylen (perchloroetylen)",un:"1897",ke:"60",c:"6.1",d:1.625,a:0.00102,k:98,al:"tetrachloorethyleen perchloorethyleen tetrachloroethylene perchloroethylene PER PCE"},
+ {id:"chcl3",n:"Chloroform",un:"1888",ke:"60",c:"6.1",d:1.490,a:0.00127,k:98,al:"chloroform trichloormethaan"},
+ {id:"aniline",n:"Anilina",un:"1547",ke:"60",c:"6.1",d:1.022,a:0.00085,k:98,al:"aniline aniline"},
+ {id:"ech",n:"Epichlorohydryna",un:"2023",ke:"63",c:"6.1 (3)",d:1.183,a:0.00100,k:98,al:"epichloorhydrine epichlorohydrin ECH"},
+ {id:"butylglycol",n:"Butyloglikol (2-butoksyetanol)",un:"2369",ke:"60",c:"6.1",d:0.903,a:0.00093,k:98,al:"butylglycol ethylene glycol monobutyl ether 2-butoxyethanol EGBE"},
+ {id:"g3082",n:"Materiał zagrażający środowisku, ciekły, i.n.o.",un:"3082",ke:"90",c:"9",d:1.000,a:0.00080,k:100,gen:1,al:"milieugevaarlijke stof vloeibaar environmentally hazardous substance liquid n.o.s. NOS"},
+ {id:"hfo",n:"Olej opałowy ciężki (podgrzewany)",un:"3082",ke:"90",c:"9",d:0.980,a:0.00070,k:100,t:60,lim:98,al:"zware stookolie heavy fuel oil HFO fuel oil"},
+ {id:"meg",n:"Glikol monoetylenowy (MEG)",un:"",ke:"",c:"",d:1.116,a:0.00062,k:100,al:"monoethyleenglycol ethyleenglycol monoethylene glycol ethylene glycol MEG glikol"},
+ {id:"deg",n:"Glikol dietylenowy (DEG)",un:"",ke:"",c:"",d:1.120,a:0.00064,k:100,al:"diethyleenglycol diethylene glycol DEG glikol"},
+ {id:"teg",n:"Glikol trietylenowy (TEG)",un:"",ke:"",c:"",d:1.126,a:0.00068,k:100,al:"triethyleenglycol triethylene glycol TEG glikol"},
+ {id:"mpg",n:"Glikol propylenowy (MPG)",un:"",ke:"",c:"",d:1.038,a:0.00072,k:100,al:"propyleenglycol monopropylene glycol propylene glycol MPG PG glikol"},
+ {id:"glycerol",n:"Gliceryna (glicerol 99%)",un:"",ke:"",c:"",d:1.264,a:0.00050,k:100,al:"glycerine glycerol glycerin"},
+ {id:"glycerolcr",n:"Gliceryna surowa (~80%)",un:"",ke:"",c:"",d:1.250,a:0.00050,k:100,al:"ruwe glycerine crude glycerine glycerol"},
+ {id:"adblue",n:"AdBlue (mocznik 32,5%)",un:"",ke:"",c:"",d:1.091,a:0.00045,k:100,al:"AdBlue ureum oplossing urea solution DEF AUS32"},
+ {id:"uan",n:"Nawóz RSM / UAN 32",un:"",ke:"",c:"",d:1.320,a:0.00050,k:100,al:"UAN RSM vloeibare kunstmest liquid fertilizer urea ammonium nitrate solution"},
+ {id:"sorbitol",n:"Sorbitol 70%",un:"",ke:"",c:"",d:1.300,a:0.00045,k:100,visc:1,al:"sorbitol"},
+ {id:"glucose",n:"Syrop glukozowy",un:"",ke:"",c:"",d:1.420,a:0.00040,k:100,visc:1,al:"glucosestroop glucose syrup"},
+ {id:"waterglass",n:"Szkło wodne sodowe",un:"",ke:"",c:"",d:1.380,a:0.00045,k:100,al:"waterglas natriumsilicaat sodium silicate water glass"},
+ {id:"fame",n:"Biodiesel (FAME)",un:"",ke:"",c:"",d:0.883,a:0.00083,k:100,al:"biodiesel FAME RME B100 fatty acid methyl ester"},
+ {id:"baseoil",n:"Olej bazowy mineralny (SN150)",un:"",ke:"",c:"",d:0.865,a:0.00070,k:100,al:"basisolie base oil SN150 SN500 lube"},
+ {id:"hydr",n:"Olej hydrauliczny / smarowy",un:"",ke:"",c:"",d:0.875,a:0.00068,k:100,al:"hydraulische olie smeerolie hydraulic oil lubricating oil lube"},
+ {id:"trafo",n:"Olej transformatorowy",un:"",ke:"",c:"",d:0.880,a:0.00070,k:100,al:"transformatorolie transformer oil"},
+ {id:"rape",n:"Olej rzepakowy",un:"",ke:"",c:"",d:0.917,a:0.00072,k:100,al:"koolzaadolie raapzaadolie rapeseed oil canola"},
+ {id:"sun",n:"Olej słonecznikowy",un:"",ke:"",c:"",d:0.921,a:0.00072,k:100,al:"zonnebloemolie sunflower oil"},
+ {id:"soy",n:"Olej sojowy",un:"",ke:"",c:"",d:0.922,a:0.00072,k:100,al:"sojaolie soybean oil soya oil"},
+ {id:"corn",n:"Olej kukurydziany",un:"",ke:"",c:"",d:0.922,a:0.00072,k:100,al:"maisolie corn oil maize oil"},
+ {id:"linseed",n:"Olej lniany",un:"",ke:"",c:"",d:0.931,a:0.00072,k:100,al:"lijnolie linseed oil"},
+ {id:"palm",n:"Olej palmowy (podgrzewany)",un:"",ke:"",c:"",d:0.914,a:0.00073,k:100,t:55,lim:98,al:"palmolie palm oil CPO RBD"},
+ {id:"coconut",n:"Olej kokosowy (podgrzewany)",un:"",ke:"",c:"",d:0.924,a:0.00073,k:100,t:40,lim:98,al:"kokosolie coconut oil"},
+ {id:"tallow",n:"Tłuszcz zwierzęcy / łój (podgrzewany)",un:"",ke:"",c:"",d:0.915,a:0.00075,k:100,t:60,lim:98,al:"dierlijk vet talg rundvet tallow animal fat"},
+ {id:"uco",n:"Olej posmażalniczy (UCO)",un:"",ke:"",c:"",d:0.920,a:0.00072,k:100,al:"gebruikte frituurolie frituurvet used cooking oil UCO"},
+ {id:"molasses",n:"Melasa",un:"",ke:"",c:"",d:1.400,a:0.00040,k:100,visc:1,al:"melasse molasses"},
+ {id:"custom",n:"Inny produkt (własne dane)",un:"",ke:"",c:"",d:1.000,a:0.00060,k:100,gen:1,al:"inny eigen ander other custom"}
 ];
+const COLORS=["var(--p1)","var(--p2)","var(--p3)","var(--p4)"], MAXP=4, MAXC=10;
 const $=id=>document.getElementById(id);
 const fmt=(v,d=0)=>Number(v).toLocaleString("pl-PL",{minimumFractionDigits:d,maximumFractionDigits:d});
-const EXAMPLE={prod:"diesel",d15:0.835,alpha:0.00084,temp:12,lim:"",kform:"100",visc:false,mass:24500,payload:"",target:50,
- comps:[{c:9500,b:true},{c:7000,b:false},{c:6500,b:false},{c:9500,b:false}],un:"1202",ke:"30"};
-let S;
-try{S=JSON.parse(localStorage.getItem("cysterna-v1"))}catch(e){S=null}
-if(!S||!Array.isArray(S.comps))S=JSON.parse(JSON.stringify(EXAMPLE));
-if(S.strategy!=="min")S.strategy="even";if(!Array.isArray(S.manual))S.manual=[];
-let chosen=0, lastSolutions=[], solveCache={k:null,v:[]};
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm=s=>String(s||"").toLowerCase().replace(/ł/g,"l").normalize("NFD").replace(/[̀-ͯ]/g,"");
+const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v);return true}catch(e){return false}};
 
-function save(){try{localStorage.setItem("cysterna-v1",JSON.stringify(S))}catch(e){}}
+// ---- Produkty: wspólny widok bazy i „moich”
+function allProducts(){return [...S.myProducts.map(p=>({...p,my:1,id:p.id})),...DB.map(p=>({...p,id:"b:"+p.id}))]}
+function findProduct(pid){return allProducts().find(p=>p.id===pid)||null}
+function loadFromProduct(p,mass,keepTemp){
+ return {pid:p.id,name:p.n,d15:p.d,alpha:p.a,temp:p.t!==undefined?p.t:(keepTemp!==undefined?keepTemp:12),lim:p.lim||"",kform:String(p.k||100),
+  visc:!!p.visc,un:p.un||"",ke:p.ke||"",cls:p.c||"",gen:!!p.gen,mass:mass||0};
+}
 
-// ---- UI: produkt
-const sel=$("prod");
-{const groups={};PRODUCTS.forEach(p=>{let g=groups[p.g];if(!g){g=groups[p.g]=document.createElement("optgroup");g.label=p.g;sel.appendChild(g)}
- const o=document.createElement("option");o.value=p.id;o.textContent=p.n+(p.un?" · UN "+p.un:"");g.appendChild(o)})}
-function loadForm(){
- sel.value=S.prod;$("d15").value=S.d15;$("alpha").value=S.alpha;$("temp").value=S.temp;$("lim").value=S.lim;
- $("kform").value=S.kform;$("visc").checked=S.visc;$("mass").value=S.mass;$("payload").value=S.payload;$("target").value=S.target;
- renderPlate();renderComps();
+// ---- Stan i migracja (dane nigdy nie są kasowane; stary zapis zostaje jako kopia)
+function exampleState(){
+ const b=id=>DB.find(p=>p.id===id);
+ const tid=uid("t");
+ return {schema:SCHEMA,trailers:[{id:tid,fleet:"Przykład",reg:"",payload:"",comps:[{c:9500,b:true},{c:7000,b:false},{c:6500,b:false},{c:9500,b:false}]}],
+  trailerId:tid,myProducts:[],recent:[],loads:[loadFromProduct({...b("diesel"),id:"b:diesel"},16000),loadFromProduct({...b("petrol"),id:"b:petrol"},6500)],
+  target:50,strategy:"even",manual:[],dirty:false,lastBackup:0,seenVersion:""};
 }
-function renderPlate(){
- $("pl-k").textContent=S.ke||"";$("pl-un").textContent=S.un||(S.nadr?"bez ADR":"");
- $("plate").classList.toggle("none",!S.un);
+function fromV1(o){
+ const S=exampleState(),t=S.trailers[0];
+ if(Array.isArray(o.comps)&&o.comps.length){t.comps=o.comps.map(k=>({c:+k.c||0,b:!!k.b}));t.fleet="Naczepa 1"}
+ t.payload=o.payload||"";S.target=o.target!==undefined?+o.target:50;S.strategy=o.strategy==="min"?"min":"even";
+ const bp=DB.find(p=>p.id===o.prod);
+ S.loads=[{pid:bp?"b:"+bp.id:"b:custom",name:bp&&bp.id!=="custom"?bp.n:"Inny produkt",d15:o.d15,alpha:o.alpha,temp:o.temp,lim:o.lim||"",kform:String(o.kform||100),
+  visc:!!o.visc,un:o.un||"",ke:o.ke||"",cls:bp?bp.c:"",gen:false,mass:+o.mass||0}];
+ S.seenVersion="1";
+ return S;
 }
-sel.addEventListener("change",()=>{
- const p=PRODUCTS.find(x=>x.id===sel.value);S.prod=p.id;
- if(p.id!=="custom"){S.d15=p.d;S.alpha=p.a;S.kform=String(p.k);S.un=p.un;S.ke=p.ke;S.nadr=!!p.nadr;S.visc=!!p.visc;S.lim=p.lim||"";if(p.t!==undefined)S.temp=p.t}else{S.un="";S.ke="";S.nadr=false}
- $("askNote").hidden=true;loadForm();update();
-});
-["d15","alpha","temp","lim","mass","payload","target"].forEach(id=>$(id).addEventListener("input",()=>{S[id]=$(id).value;update()}));
-$("kform").addEventListener("change",()=>{S.kform=$("kform").value;update()});
-$("visc").addEventListener("change",()=>{S.visc=$("visc").checked;update()});
+function loadState(){
+ let raw=lsGet(KEY),s=null;
+ if(raw){try{s=JSON.parse(raw)}catch(e){s=null}}
+ if(s&&s.schema===SCHEMA&&Array.isArray(s.trailers)&&s.trailers.length)return sanitize(s);
+ const old=lsGet("cysterna-v1");
+ if(old){try{const o=JSON.parse(old);if(o&&typeof o==="object"){lsSet("cysterna-v1-kopia-przed-migracja",old);const n=fromV1(o);lsSet(KEY,JSON.stringify(n));return n}}catch(e){}}
+ if(raw)lsSet("cysterna-uszkodzony-zapis",raw);
+ return exampleState();
+}
+function sanitize(s){
+ const d=exampleState();
+ for(const k of Object.keys(d))if(s[k]===undefined)s[k]=d[k];
+ if(!s.trailers.some(t=>t.id===s.trailerId))s.trailerId=s.trailers[0].id;
+ if(!Array.isArray(s.loads)||!s.loads.length)s.loads=[loadFromProduct({...DB[0],id:"b:diesel"},0)];
+ if(s.strategy!=="min")s.strategy="even";
+ return s;
+}
+let S=loadState();
+let chosen=0,solveCache={k:null,v:null},sample=null,downloads=null,persistState="?";
+const T=()=>S.trailers.find(t=>t.id===S.trailerId)||S.trailers[0];
+let saveTimer=null;
+function save(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>lsSet(KEY,JSON.stringify(S)),150)}
+function markDirty(){S.dirty=true;renderBackupState()}
+window.addEventListener("pagehide",()=>lsSet(KEY,JSON.stringify(S)));
 
-// ---- UI: komory
-function renderComps(){
- const box=$("comps");box.innerHTML="";
- S.comps.forEach((k,i)=>{
-  const r=document.createElement("div");r.className="comp";
-  r.innerHTML=`<span class="n">${i+1}</span>
-   <input type="number" id="cap${i}" min="100" step="50" value="${k.c}" aria-label="Pojemność komory ${i+1} w litrach">
-   <div class="seg" role="group" aria-label="Falochrony w komorze ${i+1}">
-    <button type="button" data-v="1" aria-pressed="${k.b}">Tak</button><button type="button" data-v="0" aria-pressed="${!k.b}">Nie</button></div>
-   <button type="button" class="del" aria-label="Usuń komorę ${i+1}" ${S.comps.length<2?"disabled":""}>✕</button>`;
-  r.querySelector("input").addEventListener("input",e=>{k.c=+e.target.value;update()});
-  r.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{k.b=b.dataset.v==="1";renderComps();update()}));
-  r.querySelector(".del").addEventListener("click",()=>{S.comps.splice(i,1);renderComps();update()});
-  box.appendChild(r);
- });
+// ---- Combobox (wyszukiwarka z listą trafień)
+function makeCombo(input,{items,onPick,display}){
+ const box=input.parentElement,list=document.createElement("ul");
+ list.className="combo-list";list.setAttribute("role","listbox");list.id=input.id+"-list";list.hidden=true;box.appendChild(list);
+ input.setAttribute("role","combobox");input.setAttribute("aria-autocomplete","list");input.setAttribute("aria-controls",list.id);input.setAttribute("aria-expanded","false");
+ let cur=[],act=-1,open=false;
+ function render(){
+  const q=open&&input.dataset.typed==="1"?input.value:"";
+  cur=items(q);act=cur.findIndex(x=>!x.head);let h="";
+  cur.forEach((it,i)=>{if(it.head){h+=`<li class="opt-head" role="presentation">${esc(it.head)}</li>`;return}
+   h+=`<li class="opt${it.action?" act":""}" role="option" id="${list.id}-${i}" data-i="${i}" aria-selected="${i===act}">${it.html}</li>`});
+  list.innerHTML=h||`<li class="opt-head" role="presentation">Brak wyników</li>`;
+  list.hidden=false;input.setAttribute("aria-expanded","true");mark();
+ }
+ function mark(){list.querySelectorAll(".opt").forEach(el=>el.setAttribute("aria-selected",+el.dataset.i===act));
+  const el=list.querySelector(`[data-i="${act}"]`);if(el){input.setAttribute("aria-activedescendant",el.id);el.scrollIntoView({block:"nearest"})}}
+ function close(){open=false;list.hidden=true;input.setAttribute("aria-expanded","false");input.dataset.typed="";input.value=display()}
+ function pick(i){const it=cur[i];if(!it||it.head)return;close();onPick(it);input.blur()}
+ input.addEventListener("focus",()=>{open=true;input.dataset.typed="";render();setTimeout(()=>{try{input.select()}catch(e){}},0)});
+ input.addEventListener("input",()=>{open=true;input.dataset.typed="1";render()});
+ input.addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();if(!open){open=true;render()}const step=e.key==="ArrowDown"?1:-1;let i=act;
+   for(let n=0;n<cur.length;n++){i=(i+step+cur.length)%cur.length;if(!cur[i].head){act=i;break}}mark()}
+  else if(e.key==="Enter"){if(open&&act>=0){e.preventDefault();pick(act)}}
+  else if(e.key==="Escape"){close();input.blur()}});
+ input.addEventListener("blur",()=>setTimeout(()=>{if(document.activeElement!==input)close()},150));
+ list.addEventListener("pointerdown",e=>{const el=e.target.closest(".opt");if(el){e.preventDefault();pick(+el.dataset.i)}});
+ input.value=display();
+ return {refresh:()=>{if(!open)input.value=display()}};
 }
-document.querySelectorAll("#strat button").forEach(b=>b.addEventListener("click",()=>{S.strategy=b.dataset.v;if(chosen!=="manual")chosen=0;update()}));
-$("addComp").addEventListener("click",()=>{if(S.comps.length>=10)return;S.comps.push({c:7000,b:true});renderComps();update()});
 
-// ---- obliczenia
-function params(){
- const d15=+S.d15, a=+S.alpha, t=+S.temp, K=+S.kform;
- const dt=d15/(1+a*(t-15));                    // gęstość w temp. załadunku
- let fmax=K/(1+a*(50-t))/100;                   // ADR 4.3.2.2.1
- fmax=Math.min(fmax,1);
- const lim=parseFloat(S.lim); if(lim>0) fmax=Math.min(fmax,lim/100);
- return {d15,a,t,dt,fmax};
+// ---- Wyszukiwanie produktów
+function productMeta(p){return p.un?`UN ${p.un} · ${p.ke||"–"} · kl. ${p.c||"?"}`:"bez ADR"}
+function productHTML(p){
+ return `<span class="on">${esc(p.n)}${p.my?'<span class="tag my">mój</span>':p.gen?'<span class="tag">ogólny</span>':""}</span><span class="meta">${esc(productMeta(p))}</span>
+ <span class="sub">${fmt(p.d,3)} kg/l w 15 °C${p.my?" · z dokumentu":p.gen?" · gęstość wpisz z dokumentu":" · typowa"}${p.t!==undefined?` · ładowany ok. ${p.t} °C`:""}</span>`;
 }
-function compModel(fmax){
- const tot=S.comps.reduce((s,k)=>s+(+k.c||0),0);let acc=0;
- return S.comps.map(k=>{const C=+k.c||0;const pos=tot?(acc+C/2)/tot:0;acc+=C;
-  const restr=!k.b&&C>7500&&!S.visc;const F=Math.floor(C*fmax);
-  const segs=restr?[[1,Math.min(Math.floor(C*0.2),F)],[Math.ceil(C*0.8),F]].filter(s=>s[1]>=s[0]):[[1,F]];
-  return {C,F,pos,restr,b:k.b,segs};});
+function searchProducts(q){
+ const all=allProducts(),nq=norm(q).trim();
+ if(!nq){
+  const rec=S.recent.map(id=>all.find(p=>p.id===id)).filter(Boolean).slice(0,5);
+  const out=[];
+  if(rec.length){out.push({head:"Ostatnio używane"});rec.forEach(p=>out.push({p,html:productHTML(p)}))}
+  const mine=all.filter(p=>p.my&&!rec.includes(p)).slice(0,5);
+  if(mine.length){out.push({head:"Moje produkty"});mine.forEach(p=>out.push({p,html:productHTML(p)}))}
+  out.push({head:"Wpisz nazwę (PL/NL/EN) lub numer UN"});
+  if(!rec.length&&!mine.length)["b:diesel","b:petrol","b:h2so4","b:naoh50","b:meg"].forEach(id=>{const p=all.find(x=>x.id===id);if(p)out.push({p,html:productHTML(p)})});
+  return out;
+ }
+ const toks=nq.split(/\s+/).filter(Boolean),digits=/^\d{1,4}$/.test(nq.replace(/^un\s*/,""))?nq.replace(/^un\s*/,""):null;
+ const res=[];
+ for(const p of all){
+  const nn=norm(p.n),hay=nn+" "+norm(p.al||"")+" "+(p.un?"un"+p.un+" "+p.un:"");
+  if(!toks.every(t=>hay.includes(t)))continue;
+  let r=5;
+  if(digits&&p.un===digits)r=0;else if(digits&&p.un&&p.un.startsWith(digits))r=1;
+  else if(nn.startsWith(toks[0]))r=2;else if(nn.split(/[\s(\/,–-]+/).some(w=>w.startsWith(toks[0])))r=3;else if(nn.includes(toks[0]))r=4;
+  res.push({p,r:r-(p.my?0.5:0)+(p.gen?0.3:0),o:all.indexOf(p)});
+ }
+ res.sort((a,b)=>a.r-b.r||a.o-b.o);
+ const out=res.slice(0,8).map(x=>({p:x.p,html:productHTML(x.p)}));
+ if(sample)out.push({action:"ask",q,html:`<span class="on">Zapytaj Claude o „${esc(q)}”</span><span class="sub">Oszacowanie z wiedzy ogólnej, nie z bazy terminalu</span>`});
+ out.push({action:"my",q,html:`<span class="on">+ Dodaj „${esc(q)}” jako mój produkt</span><span class="sub">Wpiszesz gęstość z dokumentu</span>`});
+ if(!res.length)out.unshift({head:"Brak w bazie"});
+ return out;
 }
+function pushRecent(pid){S.recent=[pid,...S.recent.filter(x=>x!==pid)].slice(0,6)}
+
+// ---- Parametry i model komór
+function lp(L){
+ const d15=+L.d15,a=+L.alpha||0,t=+L.temp||0,K=+L.kform||100;
+ const dt=d15>0?d15/(1+a*(t-15)):0;
+ let fmax=Math.min(K/(1+a*(50-t))/100,1);const lim=parseFloat(L.lim);if(lim>0)fmax=Math.min(fmax,lim/100);
+ const mass=Math.max(0,+L.mass||0);
+ return {d15,a,t,dt,fmax,mass,V:dt>0?mass/dt:0,visc:!!L.visc,ok:d15>0&&dt>0&&fmax>0};
+}
+function compBase(){const cs=T().comps,tot=cs.reduce((s,k)=>s+(+k.c||0),0);let acc=0;
+ return cs.map(k=>{const C=Math.max(0,+k.c||0),pos=tot?(acc+C/2)/tot:0.5;acc+=C;return {C,pos,b:!!k.b}})}
+function compFor(cb,P){return cb.map(m=>{const restr=!m.b&&m.C>7500&&!P.visc,F=Math.floor(m.C*P.fmax);
+ const segs=restr?[[1,Math.min(Math.floor(m.C*0.2),F)],[Math.ceil(m.C*0.8),F]].filter(s=>s[1]>=s[0]):[[1,F]];
+ return {C:m.C,pos:m.pos,b:m.b,F,restr,segs}})}
 const inSegs=(x,segs)=>segs.some(s=>x>=s[0]-0.5&&x<=s[1]+0.5);
 const okAmt=(x,m)=>x<=0.5||inSegs(x,m.segs)||Math.abs(x-m.F)<=0.5;
-function evalAlloc(x,M,target,mode){
- let pen=0,sum=0,mom=0;const fills=[];
- x.forEach((v,i)=>{const m=M[i];sum+=v;mom+=v*m.pos;fills.push(m.C?v/m.C:0);
-  if(v>0&&v<m.F-0.5){const p=v/m.C;
-   if(mode==="even"){if(m.restr)pen+=p>=0.8?0.5:4;else if(!m.b)pen+=2}
-   else{if(m.restr)pen+=p>=0.8?3:7;else if(m.b)pen+=2;else pen+=5}}});
- const cog=sum?mom/sum:0.5,spread=fills.length?Math.max(...fills)-Math.min(...fills):0;
- return {s:pen+20*Math.abs(cog-target)+(mode==="even"?10*spread:0),cog,pen,spread};
-}
-// Wspólny stopień napełnienia w grupie; komory, którym wypada strefa zakazana 20–80% lub ponad maks., są przypinane do granicy.
-function equalShare(base,g,R,M,dir){
+function partialPen(v,m,mode){if(v<=0.5||v>=m.F-0.5)return 0;const p=v/m.C;
+ if(mode==="even")return m.restr?(p>=0.8?0.5:4):(m.b?0:4);
+ return m.restr?(p>=0.8?3:7):(m.b?2:5)}
+// Wspólny stopień napełnienia w grupie; komory w strefie zakazanej 20–80% lub ponad maks. przypinane do granicy
+function equalShare(base,g,R,Mp,dir){
  const x=base.slice(),fixed=new Map();
  for(let it=0;it<=g.length;it++){
   const free=g.filter(i=>!fixed.has(i));let rest=R;fixed.forEach(v=>rest-=v);
   if(!free.length){if(Math.abs(rest)>1)return null;break}
-  const cg=free.reduce((s,i)=>s+M[i].C,0),f=rest/cg;let changed=false;
-  for(const i of free){const m=M[i],v=f*m.C;
+  const cg=free.reduce((s,i)=>s+Mp[i].C,0);if(cg<=0)return null;const f=rest/cg;let changed=false;
+  for(const i of free){const m=Mp[i],v=f*m.C;
    if(v>m.F){fixed.set(i,m.F);changed=true}
    else if(m.restr&&v>m.C*0.2&&v<m.C*0.8){fixed.set(i,dir>0?Math.ceil(m.C*0.8):Math.floor(m.C*0.2));changed=true}}
-  if(!changed){let used=0;free.forEach((i,k)=>{const v=k===free.length-1?rest-used:Math.round(f*M[i].C);used+=v;x[i]=v});break}
+  if(!changed){let used=0;free.forEach((i,k)=>{const v=k===free.length-1?rest-used:Math.round(f*Mp[i].C);used+=v;x[i]=v});break}
  }
  fixed.forEach((v,i)=>x[i]=v);
- for(const i of g){const v=x[i];if(v<1||v>M[i].F+0.5||!okAmt(v,M[i]))return null}
+ for(const i of g){const v=x[i];if(v<1||v>Mp[i].F+0.5||!okAmt(v,Mp[i]))return null}
  return x;
 }
-// Każda komora: pusta / pełna / w grupie o wspólnym stopniu napełnienia; dodatkowo nierówny podział na 2 komory.
-function solve(V,M,target,collect,mode){
- const n=M.length,out=[];V=Math.round(V);
- const st=new Array(n).fill(0),total=Math.pow(3,n);
- for(let code=0;code<total;code++){
-  let c=code,g=[],R=V;
-  for(let i=0;i<n;i++){st[i]=c%3;c=(c-st[i])/3;if(st[i]===1)R-=M[i].F;else if(st[i]===2)g.push(i)}
+// Wszystkie rozkłady objętości V na komory idx (każda niepusta): pełne + grupa o wspólnym napełnieniu, dla 2 komór także nierówny podział
+function subsetAllocs(V,idx,Mp,n){
+ const k=idx.length,out=[];V=Math.round(V);
+ let cap=0;for(const i of idx){if(Mp[i].F<1)return out;cap+=Mp[i].F}
+ if(V>cap+1||V<k)return out;
+ for(let code=0;code<(1<<k);code++){
+  const x=new Array(n).fill(0),g=[];let R=V;
+  for(let j=0;j<k;j++){const i=idx[j];if(code>>j&1){x[i]=Mp[i].F;R-=Mp[i].F}else g.push(i)}
   if(R<-0.5)continue;
-  const base=st.map((s,i)=>s===1?M[i].F:0);
-  if(!g.length){if(Math.abs(R)<=1){if(!collect)return true;out.push(base)}continue}
+  if(!g.length){if(Math.abs(R)<=1)out.push(x);continue}
   if(R<g.length)continue;
-  // wspólny stopień napełnienia
-  for(const dir of [1,-1]){const x=equalShare(base,g,R,M,dir);if(x){if(!collect)return true;out.push(x)}}
-  if(g.length===2){
-   const [i,j]=g,cand=new Set();
-   M[i].segs.forEach(s=>{for(let k=0;k<=40;k++)cand.add(Math.round(s[0]+(s[1]-s[0])*k/40))});
-   M[j].segs.forEach(s=>{cand.add(R-s[0]);cand.add(R-s[1])});
-   let best=null,bs=Infinity;
-   for(const xi of cand){const xj=R-xi;
-    if(xi<1||xj<1||xi>M[i].F+0.5||xj>M[j].F+0.5)continue;
-    if(!inSegs(xi,M[i].segs)||!inSegs(xj,M[j].segs))continue;
-    const y=base.slice();y[i]=xi;y[j]=xj;
-    if(!collect)return true;
-    const sc=evalAlloc(y,M,target,mode).s;if(sc<bs){bs=sc;best=y}}
-   if(best)out.push(best);
+  for(const dir of [1,-1]){const y=equalShare(x,g,R,Mp,dir);if(y)out.push(y)}
+  if(g.length===2){const [i,j]=g,cand=new Set();
+   Mp[i].segs.forEach(s=>{for(let t=0;t<=20;t++)cand.add(Math.round(s[0]+(s[1]-s[0])*t/20))});
+   Mp[j].segs.forEach(s=>{cand.add(R-s[0]);cand.add(R-s[1])});
+   const ok=[];for(const xi of cand){const xj=R-xi;if(xi<1||xj<1||xi>Mp[i].F+0.5||xj>Mp[j].F+0.5)continue;if(inSegs(xi,Mp[i].segs)&&inSegs(xj,Mp[j].segs))ok.push(xi)}
+   if(ok.length){ok.sort((a,b)=>a-b);for(const xi of [ok[0],ok[ok.length-1]]){const y=x.slice();y[i]=xi;y[j]=R-xi;out.push(y)}}
   }
  }
- if(!collect)return false;
- const scored=out.map(x=>({x,...evalAlloc(x,M,target,mode)})).sort((a,b)=>a.s-b.s);
- const uniq=[];for(const r of scored){const key=r.x.map(v=>Math.round(v/100)).join(",");if(!uniq.some(u=>u.key===key))uniq.push({...r,key});if(uniq.length===3)break}
- return uniq;
+ return out;
+}
+function evalAll(x,own,LPs,MP,cb,target,mode){
+ let pen=0,mass=0,mom=0,mn=1,mx=0;
+ for(let i=0;i<cb.length;i++){const C=cb[i].C,v=x[i],f=C?v/C:0;if(f<mn)mn=f;if(f>mx)mx=f;
+  if(v>0.5&&own[i]>=0){const p=own[i],kg=v*LPs[p].dt;mass+=kg;mom+=kg*cb[i].pos;pen+=partialPen(v,MP[p][i],mode)}}
+ const cog=mass?mom/mass:0.5,spread=cb.length?mx-mn:0;
+ return {s:pen+20*Math.abs(cog-target)+(mode==="even"?10*spread:0),cog,pen,spread,mass};
+}
+function localScore(x,idx,p,LPs,MP,target,mode){
+ let pen=0,mass=0,mom=0,mn=1,mx=0;
+ for(const i of idx){const m=MP[p][i],v=x[i],f=m.C?v/m.C:0;if(f<mn)mn=f;if(f>mx)mx=f;const kg=v*LPs[p].dt;mass+=kg;mom+=kg*m.pos;pen+=partialPen(v,m,mode)}
+ const cog=mass?mom/mass:0.5;return pen+20*Math.abs(cog-target)*0.5+(mode==="even"?10*(mx-mn):0);
+}
+function solveAll(LPs,MP,cb,target,mode){
+ const n=cb.length,act=[];LPs.forEach((P,p)=>{if(P.ok&&P.V>0.5)act.push(p)});
+ if(!act.length||!n)return {sols:[]};
+ const K=act.length===1?6:act.length===2?3:2,opts=[];
+ for(const p of act){const list=[];
+  for(let mask=1;mask<(1<<n);mask++){const idx=[];for(let i=0;i<n;i++)if(mask>>i&1)idx.push(i);
+   const al=subsetAllocs(LPs[p].V,idx,MP[p],n);if(!al.length)continue;
+   const sc=al.map(x=>({x,s:localScore(x,idx,p,LPs,MP,target,mode)})).sort((a,b)=>a.s-b.s);
+   list.push({mask,best:sc[0].s,c:sc.slice(0,K).map(o=>o.x)})}
+  if(!list.length)return {sols:[],fail:p};
+  list.sort((a,b)=>a.best-b.best);opts.push({p,list})}
+ opts.sort((a,b)=>a.list.length-b.list.length);
+ const top=[],LIM=30,MAXLEAF=120000,pick=[];let leaves=0,cut=false;
+ function consider(){
+  const m=pick.length,ix=new Array(m).fill(0);
+  for(;;){if(++leaves>MAXLEAF){cut=true;return}
+   const x=new Array(n).fill(0),own=new Array(n).fill(-1);
+   for(let t=0;t<m;t++){const {p,o}=pick[t],c=o.c[ix[t]];for(let i=0;i<n;i++)if(o.mask>>i&1){x[i]=c[i];own[i]=p}}
+   const e=evalAll(x,own,LPs,MP,cb,target,mode);
+   if(top.length<LIM||e.s<top[top.length-1].s){let k=top.length;while(k>0&&top[k-1].s>e.s)k--;top.splice(k,0,{x,own,...e});if(top.length>LIM)top.pop()}
+   let t=0;while(t<m){if(++ix[t]<pick[t].o.c.length)break;ix[t]=0;t++}if(t===m)break}
+ }
+ function dfs(k,used){if(cut)return;if(k===opts.length){consider();return}
+  const {p,list}=opts[k];for(const o of list){if(o.mask&used)continue;pick.push({p,o});dfs(k+1,used|o.mask);pick.pop();if(cut)return}}
+ dfs(0,0);
+ const uniq=[];for(const r of top){const key=r.x.map((v,i)=>r.own[i]+":"+Math.round(v/100)).join(",");if(!uniq.some(u=>u.key===key))uniq.push({...r,key});if(uniq.length===3)break}
+ return {sols:uniq,cut};
+}
+function feasibleSingle(V,Mp,n){for(let mask=1;mask<(1<<n);mask++){const idx=[];for(let i=0;i<n;i++)if(mask>>i&1)idx.push(i);if(subsetAllocs(V,idx,Mp,n).length)return true}return false}
+
+// ---- UI: naczepa
+let trCombo;
+function trailerLabel(t){return [t.fleet,t.reg].filter(Boolean).join(" · ")||"Naczepa bez nazwy"}
+function renderTrailer(){
+ const t=T();$("trFleet").value=t.fleet||"";$("trReg").value=t.reg||"";$("payload").value=t.payload||"";
+ $("trDel").disabled=S.trailers.length<2;trCombo.refresh();renderComps();
+}
+function renderComps(){
+ const box=$("comps"),t=T();box.innerHTML="";
+ t.comps.forEach((k,i)=>{
+  const r=document.createElement("div");r.className="comp";
+  r.innerHTML=`<span class="n">${i+1}</span>
+   <input type="number" id="cap${i}" min="100" step="50" value="${+k.c||""}" aria-label="Pojemność komory ${i+1} w litrach">
+   <div class="seg" role="group" aria-label="Falochrony w komorze ${i+1}">
+    <button type="button" data-v="1" aria-pressed="${!!k.b}">Tak</button><button type="button" data-v="0" aria-pressed="${!k.b}">Nie</button></div>
+   <button type="button" class="del" aria-label="Usuń komorę ${i+1}" ${t.comps.length<2?"disabled":""}>✕</button>`;
+  r.querySelector("input").addEventListener("input",e=>{k.c=+e.target.value;markDirty();updateSoon()});
+  r.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{k.b=b.dataset.v==="1";markDirty();renderComps();update()}));
+  r.querySelector(".del").addEventListener("click",()=>{t.comps.splice(i,1);S.manual.splice(i,1);markDirty();renderComps();update()});
+  box.appendChild(r);
+ });
+ $("addComp").disabled=t.comps.length>=MAXC;
+}
+function initTrailerUI(){
+ trCombo=makeCombo($("trSearch"),{
+  display:()=>trailerLabel(T()),
+  items:q=>{const nq=norm(q).replace(/[\s-]/g,"");
+   const list=S.trailers.filter(t=>!nq||norm((t.fleet||"")+(t.reg||"")).replace(/[\s-]/g,"").includes(nq)||norm(t.reg).includes(norm(q)))
+    .sort((a,b)=>String(a.fleet).localeCompare(String(b.fleet),"pl",{numeric:true}));
+   return list.map(t=>{const cap=t.comps.reduce((s,k)=>s+(+k.c||0),0);
+    return {t,html:`<span class="on">${esc(trailerLabel(t))}${t.id===S.trailerId?'<span class="tag my">wybrana</span>':""}</span><span class="meta">${t.comps.length} kom.</span><span class="sub">${fmt(cap)} l · ${t.comps.map(k=>fmt(k.c)).join(" / ")}</span>`}})},
+  onPick:it=>{S.trailerId=it.t.id;S.manual=[];chosen=0;renderTrailer();update()}
+ });
+ $("trFleet").addEventListener("input",e=>{T().fleet=e.target.value;trCombo.refresh();markDirty();update()});
+ $("trReg").addEventListener("input",e=>{T().reg=e.target.value.toUpperCase();trCombo.refresh();markDirty();update()});
+ $("trReg").addEventListener("blur",e=>{e.target.value=T().reg||""});
+ $("payload").addEventListener("input",e=>{T().payload=e.target.value;markDirty();updateSoon()});
+ $("addComp").addEventListener("click",()=>{const t=T();if(t.comps.length>=MAXC)return;t.comps.push({c:7000,b:true});markDirty();renderComps();update()});
+ $("trNew").addEventListener("click",()=>{const t={id:uid("t"),fleet:"",reg:"",payload:"",comps:[{c:7000,b:true},{c:7000,b:true},{c:7000,b:true}]};S.trailers.push(t);S.trailerId=t.id;S.manual=[];markDirty();renderTrailer();update();$("trFleet").focus()});
+ $("trCopy").addEventListener("click",()=>{const o=T(),t={...JSON.parse(JSON.stringify(o)),id:uid("t"),fleet:(o.fleet?o.fleet+" (kopia)":""),reg:""};S.trailers.push(t);S.trailerId=t.id;markDirty();renderTrailer();update();$("trFleet").focus()});
+ armButton($("trDel"),"Na pewno usunąć?",()=>{if(S.trailers.length<2)return;S.trailers=S.trailers.filter(t=>t.id!==S.trailerId);S.trailerId=S.trailers[0].id;S.manual=[];markDirty();renderTrailer();update()});
+}
+// Przycisk z potwierdzeniem w dwóch krokach (bez okienek przeglądarki)
+function armButton(btn,armedText,action){
+ const orig=btn.textContent;let timer=null;
+ btn.addEventListener("click",()=>{
+  if(btn.dataset.armed==="1"){clearTimeout(timer);btn.dataset.armed="";btn.textContent=orig;action();return}
+  btn.dataset.armed="1";btn.textContent=armedText;timer=setTimeout(()=>{btn.dataset.armed="";btn.textContent=orig},4000)});
 }
 
-// ---- render wyniku
+// ---- UI: produkty w ładunku
+const prodCombos=[];
+function plateHTML(L){return L.un?`<div class="plate" aria-label="Tablica ADR ${esc(L.ke)} ${esc(L.un)}"><div>${esc(L.ke)}</div><div>${esc(L.un)}</div></div>`:`<div class="plate none" aria-label="Bez tablicy ADR"><div></div><div></div></div>`}
+function renderLoads(){
+ const box=$("loads"),openIdx=[...box.querySelectorAll("details")].map(d=>d.open);
+ box.innerHTML="";prodCombos.length=0;
+ S.loads.forEach((L,i)=>{
+  const el=document.createElement("div");el.className="load";
+  const kf=[["100","100 · zapalne, bez zagrożeń dodatkowych"],["98","98 · toksyczne lub żrące"],["97","97 · zapalne lekko toks./żrące, zbiornik hermetyczny"],["95","95 · toksyczne/żrące, zbiornik hermetyczny"]]
+   .map(([v,t])=>`<option value="${v}"${String(L.kform)===v?" selected":""}>${t}</option>`).join("");
+  const p=findProduct(L.pid),isMy=p&&p.my;
+  el.innerHTML=`<div class="load-h"><span class="sw" style="background:${COLORS[i]}"></span><b>Produkt ${i+1}</b>
+    ${S.loads.length>1?`<button type="button" class="del" data-act="del" aria-label="Usuń produkt ${i+1}">✕</button>`:""}</div>
+   <div class="prod-top"><div class="combo"><label for="l${i}-q">Produkt: nazwa lub nr UN</label><input type="search" id="l${i}-q" autocomplete="off" placeholder="np. 1830, zwavelzuur, glikol"></div>
+    <div id="l${i}-plate">${plateHTML(L)}</div></div>
+   <p class="note warn" id="l${i}-gen" ${L.gen?"":"hidden"}>Pozycja ogólna: gęstość zależy od konkretnego produktu. Wpisz ją z dokumentu w „Parametry produktu”.</p>
+   <p class="note" id="l${i}-note" hidden></p>
+   <div class="row"><div><label for="l${i}-mass">Masa (kg)</label><input type="number" id="l${i}-mass" min="0" step="10" inputmode="numeric" value="${L.mass||""}"></div>
+    <div><label for="l${i}-temp">Temp. produktu (°C)</label><input type="number" id="l${i}-temp" step="1" min="-30" max="95" value="${L.temp}"></div></div>
+   <details${openIdx[i]||L.gen?" open":""}><summary>Parametry produktu <span class="dsum" id="l${i}-sum"></span></summary>
+    <div class="det">
+     <div class="row"><div><label for="l${i}-d15">Gęstość w 15 °C (kg/l)</label><input type="number" id="l${i}-d15" step="0.001" min="0.3" max="3" value="${L.d15}"></div>
+      <div><label for="l${i}-alpha">Wsp. rozszerzalności α (1/°C)</label><input type="number" id="l${i}-alpha" step="0.00001" min="0" max="0.003" value="${L.alpha}"></div></div>
+     <div class="row"><div><label for="l${i}-ke">Nr rozpoznawczy zagrożenia</label><input type="text" id="l${i}-ke" maxlength="4" placeholder="np. 33" value="${esc(L.ke)}"></div>
+      <div><label for="l${i}-un">Nr UN</label><input type="text" id="l${i}-un" maxlength="4" inputmode="numeric" placeholder="puste = bez ADR" value="${esc(L.un)}"></div></div>
+     <div class="row"><div><label for="l${i}-lim">Limit terminalu/firmy (%)</label><input type="number" id="l${i}-lim" step="0.5" min="50" max="100" placeholder="brak" value="${L.lim}"></div>
+      <div><label for="l${i}-kform">Wzór ADR 4.3.2.2.1</label><select id="l${i}-kform">${kf}</select></div></div>
+     <label class="check" for="l${i}-visc"><input type="checkbox" id="l${i}-visc"${L.visc?" checked":""}> Produkt lepki (≥ 2680 mm²/s w 20 °C), zasada 20/80 nie obowiązuje</label>
+     <div class="toolbar"><button type="button" data-act="savemy">${isMy?"Zaktualizuj mój produkt":"Zapisz jako mój produkt"}</button></div>
+    </div></details>`;
+  box.appendChild(el);
+  prodCombos[i]=makeCombo($(`l${i}-q`),{
+   display:()=>S.loads[i]?S.loads[i].name:"",
+   items:q=>searchProducts(q),
+   onPick:it=>{
+    if(it.action==="my"){openMyForm(null,{n:it.q});return}
+    if(it.action==="ask"){askClaude(i,it.q);return}
+    const keepT=S.loads[i].temp;S.loads[i]=loadFromProduct(it.p,S.loads[i].mass,keepT);pushRecent(it.p.id);renderLoads();update()}
+  });
+  const bind=(id,key,fn)=>$(`l${i}-${id}`).addEventListener(fn||"input",e=>{const v=e.target.type==="checkbox"?e.target.checked:e.target.value;S.loads[i][key]=v;
+   if(key==="ke"||key==="un"){S.loads[i][key]=String(v).trim();$(`l${i}-plate`).innerHTML=plateHTML(S.loads[i])}
+   if(key==="d15")$(`l${i}-gen`).hidden=true;
+   updateSoon()});
+  bind("mass","mass");bind("temp","temp");bind("d15","d15");bind("alpha","alpha");bind("ke","ke");bind("un","un");bind("lim","lim");bind("kform","kform","change");bind("visc","visc","change");
+  el.querySelector('[data-act="savemy"]').addEventListener("click",()=>saveLoadAsMy(i));
+  const del=el.querySelector('[data-act="del"]');
+  if(del)del.addEventListener("click",()=>{S.loads.splice(i,1);S.manual=S.manual.map(e=>e&&e.p===i?{p:-1,kg:e.kg}:e&&e.p>i?{p:e.p-1,kg:e.kg}:e);renderLoads();update()});
+ });
+ $("addLoad").disabled=S.loads.length>=MAXP;
+}
+function saveLoadAsMy(i){
+ const L=S.loads[i],p=findProduct(L.pid);
+ const data={n:L.name,un:L.un,ke:L.ke,c:L.cls||"",d:+L.d15,a:+L.alpha,k:+L.kform,visc:L.visc?1:0,lim:L.lim||""};
+ if(p&&p.my){const m=S.myProducts.find(x=>x.id===p.id);Object.assign(m,data);showNote(i,"Zaktualizowano mój produkt.")}
+ else{openMyForm(null,{...data,al:"",fromLoad:i});return}
+ markDirty();renderMy();
+}
+function showNote(i,txt){const n=$(`l${i}-note`);if(n){n.hidden=false;n.textContent=txt}}
+
+// ---- Zapytaj Claude (tylko w wersji w Claude)
+async function askClaude(i,name){
+ if(!sample||!name)return;showNote(i,`Szukam danych: ${name}…`);
+ try{
+  const r=await sample(`Jesteś ekspertem ADR. Podaj typowe dane produktu chemicznego przewożonego w cysternie: "${name}".
+Odpowiedz WYŁĄCZNIE obiektem JSON bez komentarzy:
+{"nazwa":"nazwa po polsku","d15":gęstość w 15°C w kg/l (liczba),"alfa":współczynnik objętościowej rozszerzalności cieplnej w 1/°C (liczba),"un":"numer UN lub pusty","kemler":"numer rozpoznawczy zagrożenia lub pusty","klasa":"klasa ADR np. 3 lub 8 (3) lub pusty","toksyczny":true/false,"zracy":true/false,"lepki":true jeśli lepkość w 20°C ≥ 2680 mm2/s,"uwagi":"jedno krótkie zdanie po polsku o niepewności danych"}
+Jeśli nie znasz produktu, zwróć {"blad":"krótki opis"}.`,{modelTier:"default"});
+  const m=r.text.match(/\{[\s\S]*\}/);const j=m?JSON.parse(m[0]):null;
+  if(!j||j.blad||!(j.d15>0)){showNote(i,"Nie udało się ustalić danych"+(j&&j.blad?": "+j.blad:"")+". Wpisz dane ręcznie.");return}
+  S.loads[i]={...S.loads[i],pid:"b:custom",name:j.nazwa||name,d15:+(+j.d15).toFixed(4),alpha:+(+j.alfa||0.0006).toFixed(5),kform:(j.toksyczny||j.zracy)?"98":"100",
+   visc:!!j.lepki,un:j.un||"",ke:j.kemler||"",cls:j.klasa||"",gen:false};
+  renderLoads();update();
+  showNote(i,`${j.nazwa||name}: dane oszacowane przez Claude, nie z bazy terminalu. ${j.uwagi||""} Porównaj z dokumentem i zapisz jako mój produkt.`);
+ }catch(e){showNote(i,e&&e.code==="rate_limited"?"Zbyt wiele zapytań. Spróbuj za chwilę.":"Zapytanie się nie powiodło. Wpisz dane ręcznie.")}
+}
+
+// ---- Moje produkty
+function renderMy(){
+ $("myCount").textContent=S.myProducts.length?`(${S.myProducts.length})`:"";
+ const box=$("myList");
+ if(!S.myProducts.length){box.innerHTML=`<p class="hint">Nie masz jeszcze własnych produktów. Dodaj je tutaj albo przyciskiem „Zapisz jako mój produkt” w karcie produktu.</p>`;return}
+ box.innerHTML=S.myProducts.slice().sort((a,b)=>a.n.localeCompare(b.n,"pl")).map(p=>`<div class="myrow"><div><div class="nm">${esc(p.n)}</div><div class="meta">${esc(productMeta(p))} · ${fmt(p.d,3)} kg/l</div></div>
+  <button type="button" data-edit="${esc(p.id)}">Edytuj</button><button type="button" class="btn-danger" data-delmy="${esc(p.id)}">Usuń</button></div>`).join("");
+ box.querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",()=>openMyForm(b.dataset.edit)));
+ box.querySelectorAll("[data-delmy]").forEach(b=>armButton(b,"Na pewno?",()=>{S.myProducts=S.myProducts.filter(p=>p.id!==b.dataset.delmy);S.recent=S.recent.filter(x=>x!==b.dataset.delmy);markDirty();renderMy()}));
+}
+function openMyForm(id,pre){
+ const p=id?S.myProducts.find(x=>x.id===id):{n:"",al:"",un:"",ke:"",c:"",d:"",a:0.0008,k:100,visc:0,lim:"",...(pre||{})};
+ const f=$("myForm");$("myPanel").open=true;f.hidden=false;
+ const kf=[["100","100 · zapalne / bez zagrożeń dodatkowych"],["98","98 · toksyczne lub żrące"],["97","97 · zbiornik hermetyczny, zapalne"],["95","95 · zbiornik hermetyczny, toks./żrące"]]
+  .map(([v,t])=>`<option value="${v}"${String(p.k)===v?" selected":""}>${t}</option>`).join("");
+ f.innerHTML=`<h3>${id?"Edytuj mój produkt":"Nowy mój produkt"}</h3>
+  <div><label for="mf-n">Nazwa</label><input type="text" id="mf-n" value="${esc(p.n)}"></div>
+  <div><label for="mf-al">Inne nazwy (z dokumentów, np. NL/EN)</label><input type="text" id="mf-al" value="${esc(p.al||"")}" placeholder="np. zwavelzuur 96% sulphuric acid"></div>
+  <div class="row"><div><label for="mf-d">Gęstość w 15 °C (kg/l)</label><input type="number" id="mf-d" step="0.0001" min="0.3" max="3" value="${p.d}"></div>
+   <div><label for="mf-a">Wsp. rozszerzalności α (1/°C)</label><input type="number" id="mf-a" step="0.00001" min="0" max="0.003" value="${p.a}"></div></div>
+  <div class="row"><div><label for="mf-un">Nr UN</label><input type="text" id="mf-un" maxlength="4" inputmode="numeric" value="${esc(p.un)}" placeholder="puste = bez ADR"></div>
+   <div><label for="mf-ke">Nr rozpoznawczy zagrożenia</label><input type="text" id="mf-ke" maxlength="4" value="${esc(p.ke)}"></div></div>
+  <div class="row"><div><label for="mf-c">Klasa ADR</label><input type="text" id="mf-c" maxlength="10" value="${esc(p.c||"")}" placeholder="np. 8 lub 3 (6.1)"></div>
+   <div><label for="mf-lim">Limit terminalu/firmy (%)</label><input type="number" id="mf-lim" step="0.5" min="50" max="100" value="${p.lim||""}" placeholder="brak"></div></div>
+  <div><label for="mf-k">Wzór ADR 4.3.2.2.1</label><select id="mf-k">${kf}</select></div>
+  <label class="check" for="mf-v"><input type="checkbox" id="mf-v"${p.visc?" checked":""}> Produkt lepki (zasada 20/80 nie obowiązuje)</label>
+  <p class="err" id="mf-err" hidden></p>
+  <div class="toolbar"><button type="button" class="btn-accent" id="mf-save">Zapisz</button><button type="button" id="mf-cancel">Anuluj</button></div>`;
+ $("mf-cancel").addEventListener("click",()=>{f.hidden=true;f.innerHTML=""});
+ $("mf-save").addEventListener("click",()=>{
+  const v=k=>$("mf-"+k).value.trim(),d=parseFloat(v("d"));
+  if(!v("n")){$("mf-err").hidden=false;$("mf-err").textContent="Wpisz nazwę produktu.";return}
+  if(!(d>=0.3&&d<=3)){$("mf-err").hidden=false;$("mf-err").textContent="Wpisz gęstość w 15 °C z dokumentu (od 0,3 do 3 kg/l).";return}
+  const data={n:v("n"),al:v("al"),un:v("un"),ke:v("ke"),c:v("c"),d,a:parseFloat(v("a"))||0,k:+v("k"),lim:v("lim"),visc:$("mf-v").checked?1:0};
+  let rec;
+  if(id){rec=S.myProducts.find(x=>x.id===id);Object.assign(rec,data)}else{rec={id:uid("m:"),...data};S.myProducts.push(rec)}
+  if(pre&&pre.fromLoad!==undefined&&S.loads[pre.fromLoad]){const i=pre.fromLoad;S.loads[i]=loadFromProduct(rec,S.loads[i].mass,S.loads[i].temp)}
+  else S.loads.forEach((L,i)=>{if(L.pid===rec.id)S.loads[i]=loadFromProduct(rec,L.mass,L.temp)});
+  pushRecent(rec.id);f.hidden=true;f.innerHTML="";markDirty();renderMy();renderLoads();update();
+ });
+ $("mf-n").focus();f.scrollIntoView({block:"nearest",behavior:"smooth"});
+}
+
+// ---- Kopia zapasowa
+function backupObj(){return {app:"kalkulator-komor",schema:SCHEMA,version:APP_VERSION,exported:new Date().toISOString(),
+ data:{trailers:S.trailers,trailerId:S.trailerId,myProducts:S.myProducts,recent:S.recent}}}
+function backupText(){const j=JSON.stringify(backupObj());return "KOMORY:"+btoa(unescape(encodeURIComponent(j)))}
+function backupDone(){S.dirty=false;S.lastBackup=Date.now();save();renderBackupState()}
+function bkMsg(t){const m=$("bkMsg");m.hidden=!t;m.textContent=t||""}
+function renderBackupState(){
+ save();
+ const real=S.myProducts.length>0||S.trailers.some(t=>t.fleet!=="Przykład");
+ $("backupChip").hidden=!(S.dirty&&real);
+ const last=S.lastBackup?new Date(S.lastBackup).toLocaleString("pl-PL",{dateStyle:"short",timeStyle:"short"}):"nigdy";
+ $("bkSum").textContent=S.dirty&&real?"(są zmiany bez kopii)":S.lastBackup?"(aktualna)":"";
+ const ps={on:"włączone. Przeglądarka nie usunie danych sama, np. przy braku miejsca.",off:"nie przyznane. Przeglądarka może usunąć dane przy braku miejsca, rób kopie.",na:"niedostępne w tym widoku.","?":"sprawdzam…"}[persistState];
+ $("bkStatus").innerHTML=`<li><b>Ostatnia kopia:</b> ${esc(last)}</li><li><b>Zapisane:</b> ${S.trailers.length} ${S.trailers.length===1?"naczepa":"naczep(y)"}, ${S.myProducts.length} moich produktów</li><li><b>Trwałe przechowywanie:</b> ${ps}</li>`;
+}
+async function shareBackup(){
+ const json=JSON.stringify(backupObj(),null,1),name=`komory-kopia-${new Date().toISOString().slice(0,10)}.json`;
+ try{
+  if(downloads){await downloads.save({filename:name,data:json});backupDone();bkMsg("Plik kopii zapisany.");return}
+  const file=new File([json],name,{type:"application/json"});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Kopia: Kalkulator komór"});backupDone();bkMsg("Kopia udostępniona. Sprawdź, czy trafiła tam, gdzie chciałeś.");return}
+  const a=document.createElement("a");a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);backupDone();bkMsg("Plik kopii pobrany do folderu Pobrane.");
+ }catch(e){if(e&&(e.name==="AbortError"||e.code==="declined"))bkMsg("Anulowano. Kopia nie została zapisana.");else bkMsg("Nie udało się zapisać pliku. Użyj „Kopiuj jako tekst”.")}
+}
+async function copyBackup(){
+ const t=backupText(),ta=$("bkText");
+ try{await navigator.clipboard.writeText(t);ta.hidden=true;backupDone();bkMsg("Skopiowano. Wklej tekst do notatek albo wyślij sobie wiadomością.")}
+ catch(e){ta.hidden=false;ta.value=t;ta.focus();ta.select();backupDone();bkMsg("Zaznaczyłem tekst kopii poniżej. Skopiuj go ręcznie (przytrzymaj → Kopiuj).")}
+}
+function parseBackup(txt){
+ txt=String(txt||"").trim();let o=null;
+ try{if(txt.startsWith("KOMORY:"))o=JSON.parse(decodeURIComponent(escape(atob(txt.slice(7).replace(/\s+/g,"")))));else o=JSON.parse(txt)}catch(e){return null}
+ if(!o||o.app!=="kalkulator-komor"||!o.data||!Array.isArray(o.data.trailers)||!o.data.trailers.length)return null;
+ return o;
+}
+function offerImport(o){
+ const f=$("bkConfirm"),d=o.data,when=o.exported?new Date(o.exported).toLocaleString("pl-PL",{dateStyle:"short",timeStyle:"short"}):"?";
+ f.hidden=false;
+ f.innerHTML=`<h3>Przywrócić kopię?</h3><p class="hint">Kopia z ${esc(when)}: ${d.trailers.length} naczep(y), ${(d.myProducts||[]).length} moich produktów. Zastąpi obecne: ${S.trailers.length} naczep(y), ${S.myProducts.length} produktów. Obecne dane zostaną zachowane w pamięci jako kopia awaryjna.</p>
+  <div class="toolbar"><button type="button" class="btn-accent" id="bkYes">Zastąp</button><button type="button" id="bkNo">Anuluj</button></div>`;
+ $("bkNo").addEventListener("click",()=>{f.hidden=true});
+ $("bkYes").addEventListener("click",()=>{
+  lsSet("cysterna-przed-przywroceniem",JSON.stringify(S));
+  S.trailers=d.trailers.map(t=>({id:t.id||uid("t"),fleet:t.fleet||"",reg:t.reg||"",payload:t.payload||"",comps:(t.comps||[]).map(k=>({c:+k.c||0,b:!!k.b}))})).filter(t=>t.comps.length);
+  if(!S.trailers.length)S.trailers=exampleState().trailers;
+  S.trailerId=S.trailers.some(t=>t.id===d.trailerId)?d.trailerId:S.trailers[0].id;
+  S.myProducts=Array.isArray(d.myProducts)?d.myProducts.filter(p=>p&&p.id&&p.n&&p.d>0):[];
+  S.recent=Array.isArray(d.recent)?d.recent:[];S.manual=[];
+  S.dirty=false;S.lastBackup=Date.now();f.hidden=true;$("bkPaste").value="";
+  renderAll();bkMsg("Kopia przywrócona.");
+ });
+}
+function initBackupUI(){
+ $("bkShare").addEventListener("click",shareBackup);
+ $("bkCopy").addEventListener("click",copyBackup);
+ $("backupChip").addEventListener("click",()=>{$("bkPanel").open=true;$("bkPanel").scrollIntoView({behavior:"smooth",block:"start"})});
+ $("bkPasteBtn").addEventListener("click",()=>{const o=parseBackup($("bkPaste").value);if(!o){bkMsg("To nie jest poprawny tekst kopii. Powinien zaczynać się od KOMORY:");return}bkMsg("");offerImport(o)});
+ $("bkFile").addEventListener("change",e=>{const file=e.target.files&&e.target.files[0];if(!file)return;const r=new FileReader();
+  r.onload=()=>{const o=parseBackup(r.result);e.target.value="";if(!o){bkMsg("Ten plik nie jest kopią kalkulatora.");return}bkMsg("");offerImport(o)};r.readAsText(file)});
+}
+
+// ---- Wynik
+let updTimer=null;function updateSoon(){clearTimeout(updTimer);updTimer=setTimeout(update,140)}
+function pname(p){return S.loads[p]?S.loads[p].name:"?"}
 function update(){
  save();
  $("targetVal").textContent=(+S.target)+"% długości";
  document.querySelectorAll("#strat button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===S.strategy));
- const P=params(),M=compModel(P.fmax),target=(+S.target)/100,mode=S.strategy;
- const mass=+S.mass,msgs=[];
- const capTot=M.reduce((s,m)=>s+m.C,0),fullTot=M.reduce((s,m)=>s+m.F,0);
- const valid=P.d15>0&&P.fmax>0&&capTot>0&&mass>0;
- const V=valid?mass/P.dt:0;
- $("stats").innerHTML=[
-  [valid?fmt(V)+" l":"–","Objętość w "+fmt(P.t)+" °C"],
-  [valid?fmt(mass/P.d15)+" l":"–","Objętość w 15 °C"],
-  [P.dt>0?fmt(P.dt,4):"–","Gęstość w temp. kg/l"],
-  [P.fmax>0?fmt(P.fmax*100,1)+"%":"–","Maks. napełnienie"]
- ].map(s=>`<div class="stat"><b>${s[0]}</b><span>${s[1]}</span></div>`).join("");
- if(+S.payload>0&&mass>+S.payload)msgs.push(["bad",`Masa ${fmt(mass)} kg przekracza podaną ładowność ${fmt(+S.payload)} kg o ${fmt(mass-S.payload)} kg.`]);
- let sols=[];
- if(!valid){msgs.push(["info","Uzupełnij gęstość, temperaturę, komory i masę."])}
- else if(V>fullTot+1){msgs.push(["bad",`Za dużo produktu. Przy maks. napełnieniu ${fmt(P.fmax*100,1)}% zmieścisz ${fmt(fullTot)} l, czyli ok. ${fmt(fullTot*P.dt)} kg. Nadwyżka: ${fmt((V-fullTot)*P.dt)} kg.`])}
+ const t=T(),cb=compBase(),n=cb.length,target=(+S.target)/100,mode=S.strategy;
+ $("resTrailer").textContent=trailerLabel(t);
+ const LPs=S.loads.map(lp),MP=LPs.map(P=>compFor(cb,P)),msgs=[];
+ LPs.forEach((P,i)=>{const el=$(`l${i}-sum`);if(el)el.textContent=P.ok?`ρ ${fmt(P.dt,4)} kg/l w ${fmt(P.t)} °C · maks. ${fmt(P.fmax*100,1)}%`:"uzupełnij gęstość"});
+ const capTot=cb.reduce((s,m)=>s+m.C,0),totMass=LPs.reduce((s,P)=>s+P.mass,0),totV=LPs.reduce((s,P)=>s+P.V,0);
+ const payload=+t.payload||0;
+ LPs.forEach((P,p)=>{if(P.mass>0&&!P.ok)msgs.push(["bad",`${pname(p)}: uzupełnij gęstość i temperaturę.`])});
+ const act=LPs.filter(P=>P.ok&&P.V>0.5);
+ let res={sols:[]};
+ if(!act.length)msgs.push(["info","Wpisz masę produktu do załadunku."]);
+ else if(capTot<=0)msgs.push(["info","Wpisz pojemności komór naczepy."]);
  else{
-  const ck=JSON.stringify([Math.round(V),M,target,mode]);if(ck!==solveCache.k){solveCache={k:ck,v:solve(V,M,target,true,mode)}}sols=solveCache.v;
-  if(!sols.length){
-   msgs.push(["bad","Tej masy nie da się rozłożyć bez naruszenia zasady 20/80 w komorach bez falochronów."]);
-   let lo=null,hi=null;
-   for(let k=1;k<=60&&(lo===null||hi===null);k++){const d=k*50;
-    if(lo===null&&mass-d>0&&solve((mass-d)/P.dt,M,target,false,mode))lo=mass-d;
-    if(hi===null&&(mass+d)/P.dt<=fullTot&&solve((mass+d)/P.dt,M,target,false,mode))hi=mass+d;}
-   if(lo!==null||hi!==null)msgs.push(["warn","Najbliższe masy, które da się poprawnie rozłożyć: "+[lo!==null?fmt(lo)+" kg":null,hi!==null?fmt(hi)+" kg":null].filter(Boolean).join(" lub ")+"."]);
+  LPs.forEach((P,p)=>{if(P.ok&&P.V>0.5){const full=MP[p].reduce((s,m)=>s+m.F,0);if(P.V>full+1)msgs.push(["bad",`${pname(p)}: ${fmt(P.mass)} kg to ${fmt(P.V)} l, a cała cysterna przy maks. napełnieniu ${fmt(P.fmax*100,1)}% mieści ${fmt(full)} l.`])}});
+  const ck=JSON.stringify([LPs.map(P=>[Math.round(P.V),P.fmax,P.visc,P.dt,P.ok]),cb,target,mode]);
+  if(ck!==solveCache.k){
+   const r=solveAll(LPs,MP,cb,target,mode);
+   if(!r.sols.length&&act.length===1){const p=LPs.findIndex(P=>P.ok&&P.V>0.5),P=LPs[p];let lo=null,hi=null;const full=MP[p].reduce((s,m)=>s+m.F,0);
+    for(let k=1;k<=40&&(lo===null||hi===null);k++){const d=k*50;
+     if(lo===null&&P.mass-d>0&&feasibleSingle((P.mass-d)/P.dt,MP[p],n))lo=P.mass-d;
+     if(hi===null&&(P.mass+d)/P.dt<=full&&feasibleSingle((P.mass+d)/P.dt,MP[p],n))hi=P.mass+d;}
+    r.near={lo,hi}}
+   solveCache={k:ck,v:r}}
+  res=solveCache.v;
+  if(!res.sols.length){
+   if(act.length===1){msgs.push(["bad","Tej masy nie da się rozłożyć bez naruszenia zasady 20/80 w komorach bez falochronów."]);
+    const nr=res.near||{};if(nr.lo!=null||nr.hi!=null)msgs.push(["warn","Najbliższe masy, które da się poprawnie rozłożyć: "+[nr.lo!=null?fmt(nr.lo)+" kg":null,nr.hi!=null?fmt(nr.hi)+" kg":null].filter(Boolean).join(" lub ")+"."])}
+   else msgs.push(["bad","Nie da się rozmieścić tych produktów osobno w komorach z zachowaniem zasad napełnienia. Zmniejsz masę któregoś produktu albo rozpisz komory ręcznie."]);
   }
+  if(res.cut)msgs.push(["info","Dużo możliwych układów: pokazane są najlepsze znalezione w limicie obliczeń."]);
  }
- lastSolutions=sols;
+ const sols=res.sols;
  if(chosen!=="manual"&&chosen>=sols.length)chosen=0;
  // przyciski wariantów
  const vb=$("variants");vb.innerHTML="";
  sols.forEach((s,i)=>{const b=document.createElement("button");b.type="button";b.textContent=i===0?"Wariant A · zalecany":"Wariant "+"ABC"[i];
   b.setAttribute("aria-pressed",chosen===i);b.addEventListener("click",()=>{chosen=i;update()});vb.appendChild(b)});
- if(capTot>0&&P.dt>0){const b=document.createElement("button");b.type="button";b.textContent="Ręcznie (kg)";b.setAttribute("aria-pressed",chosen==="manual");
-  b.addEventListener("click",()=>{chosen="manual";if(!S.manual.some(v=>+v>0)&&sols[0])copyVariant(sols[0],P);update()});vb.appendChild(b);
+ if(n>0){const b=document.createElement("button");b.type="button";b.textContent="Ręcznie (kg)";b.setAttribute("aria-pressed",chosen==="manual");
+  b.addEventListener("click",()=>{chosen="manual";if(!S.manual.some(e=>e&&+e.kg>0)&&sols[0])copyVariant(sols[0],LPs);update()});vb.appendChild(b);
   if(chosen==="manual"&&sols[0]){const c=document.createElement("button");c.type="button";c.textContent="Wczytaj wariant A";
-   c.addEventListener("click",()=>{copyVariant(sols[0],P);update()});vb.appendChild(c)}}
+   c.addEventListener("click",()=>{copyVariant(sols[0],LPs);update()});vb.appendChild(c)}}
  const manual=chosen==="manual";
- let sol;
+ let sol=null;
  if(manual){
-  S.manual=M.map((_,i)=>+S.manual[i]||0);
-  const x=S.manual.map(kg=>P.dt>0?kg/P.dt:0);sol={x,...evalAlloc(x,M,target,mode)};
- }else sol=sols[chosen];
- drawTank(M,sol,target);
- drawTable(M,sol,P,manual);
- if(sol&&manual){
-  const sumKg=S.manual.reduce((a,b)=>a+b,0),diff=sumKg-mass;
-  if(mass>0&&Math.abs(diff)>=1)msgs.unshift([Math.abs(diff)>50?"warn":"info",(diff<0?`Wpisano ${fmt(sumKg)} kg, brakuje ${fmt(-diff)} kg do masy ${fmt(mass)} kg.`:`Wpisano ${fmt(sumKg)} kg, o ${fmt(diff)} kg więcej niż masa do załadunku (${fmt(mass)} kg).`)]);
-  M.forEach((m,i)=>{const v=sol.x[i];
+  S.manual=cb.map((_,i)=>{const e=S.manual[i]||{p:-1,kg:0};return {p:(e.p>=0&&e.p<S.loads.length)?e.p:-1,kg:Math.max(0,+e.kg||0)}});
+  const x=[],own=[];S.manual.forEach(e=>{const P=LPs[e.p];own.push(e.p);x.push(e.p>=0&&P&&P.dt>0?e.kg/P.dt:0)});
+  sol={x,own,...evalAll(x,own,LPs,MP,cb,target,mode)};
+  S.manual.forEach((e,i)=>{if(e.kg>0&&e.p<0)msgs.unshift(["bad",`Komora ${i+1}: wybierz produkt.`])});
+  cb.forEach((c,i)=>{const p=own[i],v=x[i];if(p<0||v<=0.5)return;const m=MP[p][i],P=LPs[p];
    if(v>m.F+0.5)msgs.unshift(["bad",`Komora ${i+1}: ${fmt(v/m.C*100,1)}% przekracza maks. napełnienie ${fmt(P.fmax*100,1)}%. Zmniejsz o ${fmt((v-m.F)*P.dt)} kg.`]);
-   else if(m.restr&&v>0.5&&!okAmt(v,m))msgs.unshift(["bad",`Komora ${i+1}: ${fmt(v/m.C*100,1)}% jest niedozwolone. Komora bez falochronów powyżej 7500 l: do ${fmt(m.C*0.2*P.dt)} kg (20%) albo od ${fmt(m.C*0.8*P.dt)} kg (80%).`]);});
- }
+   else if(m.restr&&!okAmt(v,m))msgs.unshift(["bad",`Komora ${i+1}: ${fmt(v/m.C*100,1)}% jest niedozwolone. Komora bez falochronów powyżej 7500 l: do ${fmt(m.C*0.2*P.dt)} kg (20%) albo od ${fmt(m.C*0.8*P.dt)} kg (80%).`])});
+  LPs.forEach((P,p)=>{const sum=S.manual.reduce((s,e)=>s+(e.p===p?e.kg:0),0),diff=sum-P.mass;
+   if((P.mass>0||sum>0)&&Math.abs(diff)>=1)msgs.unshift([Math.abs(diff)>50?"warn":"info",diff<0?`${pname(p)}: wpisano ${fmt(sum)} kg, brakuje ${fmt(-diff)} kg do ${fmt(P.mass)} kg.`:`${pname(p)}: wpisano ${fmt(sum)} kg, o ${fmt(diff)} kg więcej niż ${fmt(P.mass)} kg.`])});
+ }else sol=sols[chosen]||null;
+ // statystyki
+ const used=sol?sol.x.filter(v=>v>0.5).length:0,hasSol=sol&&used>0,planMass=sol?sol.mass:0;
+ const st=[[fmt(totMass)+" kg","Masa łącznie"],[fmt(totV)+" l","Objętość w temp. zał."],[hasSol?`${used} / ${n}`:"–","Komory w użyciu"]];
+ if(payload>0){const marg=payload-(manual?planMass:totMass);st.push([(marg<0?"−":"")+fmt(Math.abs(marg))+" kg",marg<0?"Ponad ładowność":"Zapas ładowności",marg<0?"bad":"ok"]);
+  if(marg<0)msgs.unshift(["bad",`Masa przekracza dopuszczalną ładowność naczepy (${fmt(payload)} kg) o ${fmt(-marg)} kg.`])}
+ else st.push(["–","Ładowność: brak danych"]);
+ $("stats").innerHTML=st.map(s=>`<div class="stat ${s[2]||""}"><b>${s[0]}</b><span>${s[1]}</span></div>`).join("");
+ // podsumowanie produktów
+ $("psum").innerHTML=`<div><span class="h">Produkt</span><span class="h v">Masa</span><span class="h v">Litry w temp.</span><span class="h v c15">Litry w 15 °C</span></div>`+
+  LPs.map((P,p)=>`<div><span class="nm"><span class="sw" style="background:${COLORS[p]}"></span> ${esc(pname(p))}${P.ok&&P.mass?` <span class="hint">· ${fmt(P.t)} °C</span>`:""}</span>
+   <span class="v">${P.mass?fmt(P.mass)+" kg":"–"}</span><span class="v">${P.ok&&P.mass?fmt(P.V)+" l":"–"}</span><span class="v c15">${P.ok&&P.mass?fmt(P.mass/P.d15)+" l":"–"}</span></div>`).join("");
+ drawTank(cb,MP,sol,target,LPs);
+ drawTable(cb,MP,sol,LPs,manual);
  if(sol){
-  M.forEach((m,i)=>{const v=sol.x[i];
-   if(v>0&&v<m.F-0.5&&!m.b&&!m.restr)msgs.push(["warn",`Komora ${i+1} jest częściowo napełniona i nie ma falochronów. Ładunek będzie się przelewał: hamuj i skręcaj łagodnie.`]);
-   if(m.restr&&v>0&&v/m.C<=0.2)msgs.push(["warn",`Komora ${i+1}: tylko ${fmt(v/m.C*100,0)}% w dużej komorze bez falochronów. Dozwolone, ale ładunek mocno się przelewa.`]);});
+  cb.forEach((c,i)=>{const p=sol.own[i],v=sol.x[i];if(p<0||v<=0.5)return;const m=MP[p][i];
+   if(v<m.F-0.5&&!m.b&&!m.restr)msgs.push(["warn",`Komora ${i+1} jest częściowo napełniona i nie ma falochronów. Ładunek będzie się przelewał: hamuj i skręcaj łagodnie.`]);
+   if(m.restr&&v/m.C<=0.2)msgs.push(["warn",`Komora ${i+1}: tylko ${fmt(v/m.C*100,0)}% w dużej komorze bez falochronów. Dozwolone, ale ładunek mocno się przelewa.`])});
   const dev=Math.abs(sol.cog-target)*100;
-  if(dev>10)msgs.push(["info",`Środek ciężkości wypada ${fmt(dev,0)} pkt % od celu.`+(manual?"":" Przy tej masie i tych komorach lepszy rozkład nie spełnia przepisów.")]);
+  if(dev>10&&sol.mass>0)msgs.push(["info",`Środek ciężkości wypada ${fmt(dev,0)} pkt % od celu.`+(manual?"":" Przy tej masie i tych komorach lepszy rozkład nie spełnia przepisów.")]);
  }
- if(S.nadr)msgs.push(["info","Produkt nie podlega ADR. Wzór napełnienia i zasada 20/80 są tu stosowane jako dobra praktyka (przelewanie ładunku działa tak samo), nie jako wymóg prawny. Sprawdź wymagania terminalu i klienta."]);
- if(P.t>45)msgs.push(["warn",`Ładunek gorący (${fmt(P.t)} °C). Wzór ADR jest przeznaczony dla niższych temperatur i daje napełnienie bliskie 100%, dlatego ustaw limit terminalu (np. 98%). Podczas stygnięcia masa się nie zmienia, ale poziom w komorze spadnie.`]);
- if(M.some(m=>m.restr&&P.fmax<0.8))msgs.push(["bad","Maks. napełnienie jest poniżej 80%, więc duże komory bez falochronów można napełnić tylko do 20%."]);
+ if(S.loads.some((L,p)=>!L.un&&LPs[p].mass>0))msgs.push(["info","Produkt bez ADR: wzór napełnienia i zasada 20/80 są tu stosowane jako dobra praktyka, nie jako wymóg prawny. Sprawdź wymagania terminalu i klienta."]);
+ LPs.forEach((P,p)=>{if(P.mass>0&&P.t>45)msgs.push(["warn",`${pname(p)}: ładunek gorący (${fmt(P.t)} °C). Wzór ADR daje tu napełnienie bliskie 100%, ustaw limit terminalu (np. 98%). Po ostygnięciu poziom w komorze spadnie.`])});
+ LPs.forEach((P,p)=>{if(P.mass>0&&MP[p].some(m=>m.restr)&&P.fmax<0.8)msgs.push(["bad",`${pname(p)}: maks. napełnienie poniżej 80%, więc duże komory bez falochronów można napełnić tylko do 20%.`])});
  $("msgs").innerHTML=msgs.map(m=>`<li class="${m[0]}">${m[1]}</li>`).join("");
 }
-function copyVariant(sol,P){S.manual=sol.x.map(v=>Math.round(v*P.dt));$("tbl").dataset.key=""}
-function drawTank(M,sol,target){
+function copyVariant(sol,LPs){S.manual=sol.x.map((v,i)=>({p:sol.own[i],kg:sol.own[i]>=0?Math.round(v*LPs[sol.own[i]].dt):0}));$("tbl").dataset.key=""}
+function drawTank(cb,MP,sol,target,LPs){
  const t=$("tank");t.innerHTML="";
- M.forEach((m,i)=>{const v=sol?sol.x[i]:0,over=v>m.F+0.5;
+ const ref=LPs.findIndex(P=>P.ok&&P.mass>0);
+ cb.forEach((m,i)=>{const p=sol?sol.own[i]:-1,v=sol?sol.x[i]:0,mm=p>=0?MP[p][i]:ref>=0?MP[ref][i]:null,over=mm&&v>mm.F+0.5;
+  const kg=p>=0&&LPs[p]?v*LPs[p].dt:0;
   const c=document.createElement("div");c.className="cell";c.style.flex=Math.max(m.C,1)+" 1 0";
-  c.innerHTML=`<div class="fill${over?" over":""}" style="height:${m.C?Math.min(v/m.C,1)*100:0}%"></div><div class="lim" style="bottom:${m.C?m.F/m.C*100:0}%"></div>${m.b?'<div class="baf"></div>':""}
-   <div class="lbl"><strong>${i+1}</strong>${sol?fmt(v/m.C*100,1)+"%":"–"}<br>${fmt(m.C)} l</div>`;
+  c.innerHTML=`<div class="fill${over?" over":""}" style="height:${m.C?Math.min(v/m.C,1)*100:0}%;background:${p>=0?COLORS[p]:"transparent"}"></div>${mm&&m.C?`<div class="lim" style="bottom:${mm.F/m.C*100}%"></div>`:""}${m.b?'<div class="baf"></div>':""}
+   <div class="lbl"><strong>${i+1}</strong>${sol&&v>0.5?fmt(v/m.C*100,1)+"%<br>"+fmt(kg)+" kg":sol?"pusta":"–"}</div>`;
   t.appendChild(c)});
- const mk=(cls,p)=>{const e=document.createElement("div");e.className=cls;e.style.left=`calc(10px + (100% - 20px) * ${p})`;t.appendChild(e)};
- mk("cog t",target); if(sol&&sol.x.some(v=>v>0))mk("cog",sol.cog);
+ const mk=(cls,pos)=>{const e=document.createElement("div");e.className=cls;e.style.left=`calc(10px + (100% - 20px) * ${pos})`;t.appendChild(e)};
+ mk("cog t",target);if(sol&&sol.mass>0)mk("cog",sol.cog);
 }
-function statusPill(m,v,sol){
- if(!sol)return '<span class="pill p-mut">–</span>';
+function statusPill(m,v,p){
  if(v<=0.5)return '<span class="pill p-mut">pusta</span>';
+ if(p<0||!m)return '<span class="pill p-bad">wybierz produkt</span>';
  if(v>m.F+0.5)return '<span class="pill p-bad">ponad maks.</span>';
  if(m.restr&&!okAmt(v,m))return '<span class="pill p-bad">zakaz 20–80%</span>';
  if(v>=m.F-0.5)return '<span class="pill p-ok">pełna</span>';
@@ -474,56 +978,71 @@ function statusPill(m,v,sol){
  if(m.restr)return `<span class="pill p-warn">${v/m.C>=0.8?"≥ 80%":"≤ 20%"} · bez falochr.</span>`;
  return '<span class="pill p-warn">częściowa · bez falochr.</span>';
 }
-function drawTable(M,sol,P,manual){
- const tb=$("tbl"),key=M.length+"|"+manual;
+function drawTable(cb,MP,sol,LPs,manual){
+ const tb=$("tbl"),key=[cb.length,manual,S.loads.map(L=>L.name).join("|")].join("#");
  if(tb.dataset.key!==key){
-  let h=`<thead><tr><th>Komora</th><th>Pojemność</th><th>Masa (kg)</th><th>Załadunek (l)</th><th>Napełn.</th><th>Status</th></tr></thead><tbody>`;
-  M.forEach((m,i)=>{h+=`<tr><td>${i+1}${m.b?"":" <span class='hint'>bez fal.</span>"}</td><td id="c-c${i}"></td>
-   <td>${manual?`<input type="number" class="kg" id="mk${i}" min="0" step="10" inputmode="numeric" value="${S.manual[i]||""}" placeholder="0" aria-label="Masa w komorze ${i+1} w kg">`:`<span id="c-kg${i}"></span>`}</td>
+  let h=`<thead><tr><th>Komora</th><th class="l">Produkt</th><th>Pojemność</th><th>Masa (kg)</th><th>Litry</th><th>Napełn.</th><th class="l">Status</th></tr></thead><tbody>`;
+  cb.forEach((m,i)=>{
+   const prodCell=manual?`<select id="mp${i}" aria-label="Produkt w komorze ${i+1}"><option value="-1">—</option>${S.loads.map((L,p)=>`<option value="${p}">${p+1}. ${esc(L.name)}</option>`).join("")}</select>`:`<span id="c-pr${i}"></span>`;
+   h+=`<tr><td>${i+1}${m.b?"":" <span class='hint'>bez fal.</span>"}</td><td class="pr">${prodCell}</td><td id="c-c${i}"></td>
+   <td>${manual?`<input type="number" class="kg" id="mk${i}" min="0" step="10" inputmode="numeric" placeholder="0" aria-label="Masa w komorze ${i+1} w kg">`:`<span id="c-kg${i}"></span>`}</td>
    <td id="c-l${i}"></td><td id="c-p${i}"></td><td class="st" id="c-st${i}"></td></tr>`});
-  h+=`</tbody><tfoot><tr><td>Razem</td><td id="f-c"></td><td id="f-kg"></td><td id="f-l"></td><td id="f-p"></td><td></td></tr></tfoot>`;
+  h+=`</tbody><tfoot><tr><td>Razem</td><td></td><td id="f-c"></td><td id="f-kg"></td><td id="f-l"></td><td id="f-p"></td><td></td></tr></tfoot>`;
   tb.innerHTML=h;tb.dataset.key=key;
-  if(manual)M.forEach((m,i)=>$("mk"+i).addEventListener("input",e=>{S.manual[i]=Math.max(0,+e.target.value||0);update()}));
+  if(manual)cb.forEach((m,i)=>{
+   $("mk"+i).addEventListener("input",e=>{S.manual[i]={p:S.manual[i]?S.manual[i].p:-1,kg:Math.max(0,+e.target.value||0)};if(S.manual[i].p<0&&S.loads.length===1)S.manual[i].p=0;updateSoon()});
+   $("mp"+i).addEventListener("change",e=>{S.manual[i]={p:+e.target.value,kg:S.manual[i]?S.manual[i].kg:0};update()})});
  }
  let sv=0,sm=0;
- M.forEach((m,i)=>{const v=sol?sol.x[i]:0,kg=v*P.dt;sv+=v;sm+=kg;
-  $("c-c"+i).textContent=fmt(m.C)+" l";
-  if(!manual)$("c-kg"+i).textContent=sol?fmt(kg):"–";
-  else{const inp=$("mk"+i);if(document.activeElement!==inp&&+inp.value!==S.manual[i])inp.value=S.manual[i]||""}
-  $("c-l"+i).textContent=sol?fmt(v):"–";
-  $("c-p"+i).textContent=sol?fmt(m.C?v/m.C*100:0,1)+"%":"–";
-  $("c-st"+i).innerHTML=statusPill(m,v,sol)});
- const capTot=M.reduce((s,m)=>s+m.C,0);
+ cb.forEach((c,i)=>{const p=sol?sol.own[i]:-1,v=sol?sol.x[i]:0,m=p>=0?MP[p][i]:null,kg=p>=0&&LPs[p]?v*LPs[p].dt:0;sv+=v;sm+=kg;
+  $("c-c"+i).textContent=fmt(c.C)+" l";
+  if(manual){const inp=$("mk"+i),e=S.manual[i]||{p:-1,kg:0};if(document.activeElement!==inp&&+inp.value!==e.kg)inp.value=e.kg||"";
+   const se=$("mp"+i);if(document.activeElement!==se)se.value=String(e.p)}
+  else{$("c-pr"+i).innerHTML=sol&&p>=0&&v>0.5?`<span class="sw" style="background:${COLORS[p]}"></span> ${esc(pname(p))}`:"–";$("c-kg"+i).textContent=sol&&v>0.5?fmt(kg):"–"}
+  $("c-l"+i).textContent=sol&&v>0.5?fmt(v):"–";
+  $("c-p"+i).textContent=sol?fmt(c.C?v/c.C*100:0,1)+"%":"–";
+  $("c-st"+i).innerHTML=sol?statusPill(m,v,p):'<span class="pill p-mut">–</span>'});
+ const capTot=cb.reduce((s,m)=>s+m.C,0);
  $("f-c").textContent=fmt(capTot)+" l";$("f-kg").textContent=sol?fmt(sm):"–";$("f-l").textContent=sol?fmt(sv):"–";$("f-p").textContent=sol&&capTot?fmt(sv/capTot*100,1)+"%":"";
 }
 
-// ---- Zapytaj Claude (opcjonalne)
-let sample=null;
-(async()=>{try{sample=window.claude?await window.claude.use("sample"):null}catch(e){sample=null}
- if(sample)$("askBox").hidden=false})();
-$("askBtn").addEventListener("click",async()=>{
- const name=$("askName").value.trim();if(!name||!sample)return;
- const note=$("askNote");note.hidden=false;note.textContent="Szukam danych produktu…";$("askBtn").disabled=true;
- try{
-  const r=await sample(`Jesteś ekspertem ADR. Podaj typowe dane produktu chemicznego przewożonego w cysternie: "${name}".
-Odpowiedz WYŁĄCZNIE obiektem JSON bez komentarzy:
-{"nazwa":"nazwa po polsku","d15":gęstość w 15°C w kg/l (liczba),"alfa":współczynnik objętościowej rozszerzalności cieplnej w 1/°C (liczba),"un":"numer UN lub pusty","kemler":"numer rozpoznawczy zagrożenia lub pusty","toksyczny":true/false,"zracy":true/false,"lepki":true jeśli lepkość w 20°C ≥ 2680 mm2/s,"uwagi":"jedno krótkie zdanie po polsku o niepewności danych"}
-Jeśli nie znasz produktu, zwróć {"blad":"krótki opis"}.`,{modelTier:"default"});
-  const m=r.text.match(/\{[\s\S]*\}/);const j=m?JSON.parse(m[0]):null;
-  if(!j||j.blad||!(j.d15>0)){note.textContent="Nie udało się ustalić danych"+(j&&j.blad?": "+j.blad:"")+". Wpisz gęstość ręcznie.";return}
-  S.prod="custom";S.d15=+(+j.d15).toFixed(4);S.alpha=+(+j.alfa||0.0006).toFixed(5);
-  S.kform=(j.toksyczny||j.zracy)?"98":"100";S.visc=!!j.lepki;S.un=j.un||"";S.ke=j.kemler||"";S.nadr=!j.un;
-  loadForm();update();
-  note.textContent=`${j.nazwa||name}: dane oszacowane przez Claude na podstawie wiedzy ogólnej, nie z bazy terminalu. ${j.uwagi||""} Porównaj z dokumentem załadunkowym.`;
- }catch(e){note.textContent=e&&e.code==="rate_limited"?"Zbyt wiele zapytań. Spróbuj za chwilę.":"Zapytanie się nie powiodło. Wpisz dane ręcznie."}
- finally{$("askBtn").disabled=false}
-});
+// ---- Start
+function renderAll(){renderTrailer();renderLoads();renderMy();renderBackupState();$("target").value=S.target;$("tbl").dataset.key="";solveCache.k=null;update()}
+function initGeneral(){
+ $("ver").textContent=`v${APP_VERSION} · ${APP_DATE}`;
+ $("target").addEventListener("input",e=>{S.target=+e.target.value;$("targetVal").textContent=S.target+"% długości";updateSoon()});
+ document.querySelectorAll("#strat button").forEach(b=>b.addEventListener("click",()=>{S.strategy=b.dataset.v;if(chosen!=="manual")chosen=0;update()}));
+ $("addLoad").addEventListener("click",()=>{if(S.loads.length>=MAXP)return;S.loads.push(loadFromProduct({...DB.find(p=>p.id==="custom"),id:"b:custom",n:"Wybierz produkt"},0));renderLoads();update();
+  const q=$(`l${S.loads.length-1}-q`);if(q)q.focus()});
+ $("myAdd").addEventListener("click",()=>openMyForm(null,{}));
+ if(S.seenVersion!==APP_VERSION){
+  $("wnTitle").textContent=S.seenVersion?`Nowości w wersji ${APP_VERSION}`:`Kalkulator komór ${APP_VERSION}`;
+  $("wnList").innerHTML=WHATSNEW.filter(w=>S.seenVersion||!w.startsWith("Twoje")).map(w=>`<li>${esc(w)}</li>`).join("");
+  $("whatsnew").hidden=false;
+  $("wnOk").addEventListener("click",()=>{S.seenVersion=APP_VERSION;save();$("whatsnew").hidden=true});
+ }
+}
+initTrailerUI();initBackupUI();initGeneral();renderAll();
 
-loadForm();update();
+(async()=>{try{if(navigator.storage&&navigator.storage.persist){persistState=(await navigator.storage.persisted())||(await navigator.storage.persist())?"on":"off"}else persistState="na"}catch(e){persistState="na"}renderBackupState()})();
+(async()=>{if(!window.claude||!window.claude.use)return;
+ try{sample=await window.claude.use("sample")}catch(e){sample=null}
+ try{downloads=await window.claude.use("downloads")}catch(e){downloads=null}})();
 </script>
 
 <script>
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+// Instalowana wersja: service worker (offline) i sprawdzanie nowej wersji
+if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+(function(){
+ async function check(){try{const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const j=await r.json();
+  if(j&&j.version&&j.version!==APP_VERSION)document.getElementById("updbar").hidden=false}catch(e){}}
+ document.getElementById("updBtn").addEventListener("click",async()=>{
+  try{lsSet(KEY,JSON.stringify(S))}catch(e){}
+  try{const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(reg)await reg.update()}catch(e){}
+  location.reload()});
+ document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")check()});
+ setTimeout(check,3000);setInterval(check,30*60*1000);
+})();
 </script>
 </body>
 </html>

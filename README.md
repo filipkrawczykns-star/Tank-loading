@@ -1,21 +1,17 @@
 # Kalkulator komór cysterny (PWA)
 
-Aplikacja działa w całości w telefonie, także bez internetu. Dane (komory, produkt) zapisują się lokalnie w przeglądarce.
+Planowanie załadunku cysterny wielokomorowej: kilka produktów, zapisane naczepy, wyszukiwarka produktów (nazwa PL/NL/EN lub nr UN), stopień napełnienia wg ADR 4.3.2.2 i zasada 20/80 (ADR 4.3.2.3.6).
 
-## Publikacja na GitHub Pages
-1. Utwórz nowe repozytorium na GitHubie, np. `kalkulator-komor`.
-2. Wgraj do niego całą zawartość tego folderu (index.html, manifest.webmanifest, sw.js, folder icons).
-3. Settings → Pages → Source: „Deploy from a branch”, gałąź `main`, folder `/ (root)`.
-4. Po 1–2 minutach aplikacja będzie pod adresem `https://<twoj-login>.github.io/kalkulator-komor/`.
+Adres aplikacji: https://filipkrawczykns-star.github.io/tank-loading/
 
 ## Instalacja na telefonie
-- **Android (Chrome):** otwórz adres → menu ⋮ → „Zainstaluj aplikację” / „Dodaj do ekranu głównego”.
-- **iPhone (Safari):** otwórz adres → przycisk Udostępnij → „Do ekranu początkowego”.
+- **Android (Chrome):** otwórz adres → menu ⋮ → „Zainstaluj aplikację”.
+- **iPhone (Safari):** otwórz adres → Udostępnij → „Do ekranu początkowego”.
 
-Po pierwszym otwarciu z internetem aplikacja działa offline.
+## Aktualizacje
+Nie trzeba instalować ponownie ani czyścić danych. Przy otwarciu z internetem aplikacja pobiera najnowszą wersję. Jeśli była otwarta w tle, pokaże pasek „Dostępna nowa wersja – Odśwież”. Bez zasięgu działa ostatnia pobrana wersja.
 
-## Aktualizacja
-Po zmianie plików podnieś wersję w `sw.js` (`komory-v1` → `komory-v2`), żeby telefony pobrały nową wersję.
+Wydanie nowej wersji (dla autora): zmień `APP_VERSION` w `index.html`, ten sam numer w `version.json` i `CACHE` w `sw.js`.
 
-## Uwaga
-Przycisk „Zapytaj Claude” działa tylko w wersji otwartej w aplikacji Claude. W wersji zainstalowanej jest ukryty; dane produktu wpisuje się z listy lub ręcznie.
+## Dane
+Naczepy, „Moje produkty” i ustawienia są zapisane w pamięci przeglądarki na telefonie. Aktualizacje ich nie usuwają; zmiana formatu danych przenosi je automatycznie, a stary zapis zostaje jako kopia. Ręczne wyczyszczenie danych przeglądarki lub odinstalowanie aplikacji je usuwa, dlatego używaj „Kopia zapasowa” (plik przez Udostępnij albo tekst).
